@@ -10,6 +10,16 @@ This is the repo for the .NET Core backend of our app
 
 .NET 5 is used for the project, so make sure you have that
 
+#### Short intro
+
+After you clone the repo and run it, there are 2 requests in the swagger page: 
+```GET WeatherForecast``` 
+and 
+```GET WeatherForecast/GetStuff```
+The first one acts as an authentication: it can be accessed at any time, and it generates a JWT.
+That JWT that is returned has to be added at the top right of the swagger page, on the "Authenticate" button, where you will be prompted to insert a bearer token (which is the JWT). You only have to add the JWT, not the `Bearer` word too in front. 
+Afterwards, you can access the other request too, and it will not return 401 anymore, but instead it will return the proper page.
+
 ### IDE setup
 
 - Make sure that you are using the `Code Cleanup On Save` extension, since we have an .editorconfig file that will be used for the automatic formatting
