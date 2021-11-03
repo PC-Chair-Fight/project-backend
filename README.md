@@ -54,9 +54,9 @@ Other directories/files can be created at will, as long as they have a well defi
 
 ### Branches
 
-- **main**
-- **develop**
-- **'developer'/'issue-code'/'issue-name-or-short-description'**
+- **main** - used for release versions
+- **develop** - this is where you should be branching from, and creating pull requests to
+- **'developer'/'jira-issue-code'/'issue-name-or-short-description'** - please name your branches this way :)
 
 ### Pull Requests, Reviews & Merging
 
