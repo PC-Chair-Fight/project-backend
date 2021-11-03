@@ -14,8 +14,13 @@
   <ItemGroup>
     <Folder Include="Attributes\" />
     <Folder Include="Middlewares\" />
+    <Folder Include="wwwroot\Images\" />
     <Folder Include="Repos\" />
     <Folder Include="Utils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Images\hehe.png" />
   </ItemGroup>
 
 </Project>
