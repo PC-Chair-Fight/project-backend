@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
+using System.Net;
 using System.Text;
 
 namespace project_backend
@@ -83,6 +85,25 @@ namespace project_backend
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // This allows the usage of the wwwroot folder. In there, we can store static content, such as images and static pages (maybe 401/404 pages)
+            // Right now, as you can see, it is protected by authentication, so if you don't have the Bearer token in the header then the server will drop the request
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    if (!ctx.Context.User.Identity.IsAuthenticated)
+                    {
+                        ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+
+                        // If you want to redirect, consider creating a 401 page and redirecting to that using
+                        // ctx.Context.Response.Redirect("/my-401-page");
+                        ctx.Context.Response.ContentLength = 0;
+                        ctx.Context.Response.Headers.Add("Cache-Control", "no-store");
+                        ctx.Context.Response.Body = Stream.Null;
+                    }
+                }
+            });
 
             app.UseEndpoints(endpoints =>
             {

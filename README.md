@@ -21,6 +21,7 @@ File structure:
 - **Properties/** - contains the launchSettings for the app, which contains the settings and environment variables of the applcation.
 	If some variable should be provided at startup to the application,
 	then this is where it should be added, as an environment variable, under the `Development` profile environments
+- **wwwroot/** - contains static resources of the application (such as images)
 - **Attributes/** - directory for custom attributes
 - **Controllers/** - directory that contains the REST controllers. There is already an example created, with JWT authorization (both creating and verifying a JWT token)
 - **Middlewares/** - directory for custom middlewares.
