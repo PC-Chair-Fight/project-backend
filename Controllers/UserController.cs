@@ -47,13 +47,12 @@ namespace project_backend.Controllers
                     return new Token(GenerateToken(userId));
                 }
                 HttpContext.Response.StatusCode = 401;
-                //TODO: find generic a way to treat error messages
                 return new Error("Wrong credentials");
             }
             catch (Exception e)
             {
                 HttpContext.Response.StatusCode = 500;
-                return new Token("error");
+                return new Error("Internal Server Error");
             }
 
         }
