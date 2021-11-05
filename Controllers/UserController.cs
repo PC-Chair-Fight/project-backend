@@ -33,7 +33,7 @@ namespace project_backend.Controllers
         {
             UserDAO userDAO = new UserDAO
             {
-                Username = user.Username,
+                Email = user.Email,
                 Password = user.Password
             };
 

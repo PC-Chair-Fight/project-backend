@@ -17,7 +17,7 @@ namespace project_backend.Providers
         public int getUserByCredentials(UserDAO DaoUser)
         {
             var query = from user in _dbContext.Users
-                        where user.Username == DaoUser.Username && user.Password == DaoUser.Password
+                        where user.Email == DaoUser.Email && user.Password == DaoUser.Password
                         select user.Id;
             List<int> result = query.ToList<int>();
             return result.Count != 0 ? result[0] : -1;
