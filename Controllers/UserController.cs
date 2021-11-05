@@ -40,10 +40,12 @@ namespace project_backend.Controllers
             int userId = _userProvider.getUserByCredentials(userDAO);
             if (userId != -1)
             {
+                HttpContext.Response.StatusCode = 200;
                 return GenerateToken(userId);
             }
-
-            return "Error";
+            HttpContext.Response.StatusCode = 401;
+            //TODO: find generic a way to treat error messages
+            return "error";
         }
 
         private static string GenerateToken(int userId)
