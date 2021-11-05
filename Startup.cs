@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Repos;
 using System;
 using System.IO;
 using System.Net;
@@ -27,6 +29,11 @@ namespace project_backend
         {
             services.AddCors();
             services.AddControllers();
+
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseInMemoryDatabase("InMemoryDb");
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
