@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using project_backend.Models;
 using project_backend.Repos;
 using System;
 using System.Collections.Generic;
@@ -67,13 +68,5 @@ namespace project_backend.Controllers
         }
     }
 
-    public class Token
-    {
-        public string token { get; }
 
-        public Token(string tok)
-        {
-            token = tok;
-        }
-    }
 }

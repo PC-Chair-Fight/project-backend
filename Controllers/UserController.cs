@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using project_backend.Models;
 using project_backend.Models.User;
 using project_backend.Providers;
 using project_backend.Repos;
@@ -29,23 +30,32 @@ namespace project_backend.Controllers
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public string Login([FromBody] UserDTO user)
+        public Response Login([FromBody] UserDTO user)
         {
-            UserDAO userDAO = new UserDAO
+            try
             {
-                Email = user.Email,
-                Password = user.Password
-            };
+                UserDAO userDAO = new UserDAO
+                {
+                    Email = user.Email,
+                    Password = user.Password
+                };
 
-            int userId = _userProvider.getUserByCredentials(userDAO);
-            if (userId != -1)
-            {
-                HttpContext.Response.StatusCode = 200;
-                return GenerateToken(userId);
+                int userId = _userProvider.getUserIdByCredentials(userDAO);
+                if (userId != -1)
+                {
+                    HttpContext.Response.StatusCode = 200;
+                    return new Token(GenerateToken(userId));
+                }
+                HttpContext.Response.StatusCode = 401;
+                //TODO: find generic a way to treat error messages
+                return new Error("Wrong credentials");
             }
-            HttpContext.Response.StatusCode = 401;
-            //TODO: find generic a way to treat error messages
-            return "error";
+            catch (Exception e)
+            {
+                HttpContext.Response.StatusCode = 500;
+                return new Token("error");
+            }
+
         }
 
         private static string GenerateToken(int userId)

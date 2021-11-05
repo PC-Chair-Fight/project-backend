@@ -14,7 +14,7 @@ namespace project_backend.Providers
             _dbContext = databaseContext;
         }
 
-        public int getUserByCredentials(UserDAO DaoUser)
+        public int getUserIdByCredentials(UserDAO DaoUser)
         {
             var query = from user in _dbContext.Users
                         where user.Email == DaoUser.Email && user.Password == DaoUser.Password

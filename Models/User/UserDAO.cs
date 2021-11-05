@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project_backend.Models.User
 {
+    [Table("users")]
     public class UserDAO
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
