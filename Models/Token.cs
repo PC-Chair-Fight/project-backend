@@ -1,6 +1,6 @@
 ﻿namespace project_backend.Models
 {
-    public class Token : Response
+    public class Token
     {
         public string token { get; }
 

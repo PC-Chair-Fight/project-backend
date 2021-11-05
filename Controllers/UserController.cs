@@ -8,6 +8,7 @@ using project_backend.Providers;
 using project_backend.Repos;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -30,7 +31,9 @@ namespace project_backend.Controllers
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public Response Login([FromBody] UserDTO user)
+        [ProducesResponseType(typeof(Token), (int)HttpStatusCode.OK)]
+        [ProducesErrorResponseType(typeof(Error))]
+        public IActionResult Login([FromBody] UserDTO user)
         {
             try
             {
@@ -44,15 +47,15 @@ namespace project_backend.Controllers
                 if (userId != -1)
                 {
                     HttpContext.Response.StatusCode = 200;
-                    return new Token(GenerateToken(userId));
+                    return new OkObjectResult(new Token(GenerateToken(userId)));
                 }
                 HttpContext.Response.StatusCode = 401;
-                return new Error("Wrong credentials");
+                return new UnauthorizedObjectResult(new Error("Wrong credentials"));
             }
             catch (Exception e)
             {
                 HttpContext.Response.StatusCode = 500;
-                return new Error("Internal Server Error");
+                return new UnauthorizedObjectResult(new Error("Internal Server Error"));
             }
 
         }
