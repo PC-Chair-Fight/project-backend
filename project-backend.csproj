@@ -22,8 +22,8 @@
   <ItemGroup>
     <Folder Include="Attributes\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="wwwroot\Images\" />
     <Folder Include="Utils\" />
+    <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 
   <ItemGroup>

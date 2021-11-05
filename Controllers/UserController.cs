@@ -17,13 +17,11 @@ namespace project_backend.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly DatabaseContext _dbContext;
         private readonly ILogger<UserController> _logger;
         private readonly UserProvider _userProvider;
 
         public UserController(ILogger<UserController> logger, DatabaseContext databaseContext)
         {
-            _dbContext = databaseContext;
             _logger = logger;
             _userProvider = new UserProvider(databaseContext);
         }
@@ -31,36 +29,40 @@ namespace project_backend.Controllers
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public string Post()
+        public string Login([FromBody] UserDTO user)
         {
-            string Username = Request.Form["username"];
-            string Password = Request.Form["password"];
-
-            UserDAO userDAO = new UserDAO();
-            userDAO.Username = Username;
-            userDAO.Password = Password;
+            UserDAO userDAO = new UserDAO
+            {
+                Username = user.Username,
+                Password = user.Password
+            };
 
             int userId = _userProvider.getUserByCredentials(userDAO);
             if (userId != -1)
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"));
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                    new Claim(ClaimTypes.NameIdentifier,userId.ToString()),
-                    }),
-                    IssuedAt = DateTime.UtcNow,
-                    Expires = DateTime.UtcNow.AddDays(30),
-                    Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return token.ToString();
+                return GenerateToken(userId);
             }
 
             return "Error";
+        }
+
+        private static string GenerateToken(int userId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"));
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier,userId.ToString()),
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(30),
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 
