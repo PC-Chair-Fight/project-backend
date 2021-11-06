@@ -44,10 +44,8 @@ namespace project_backend.Controllers
             int userId = _userProvider.getUserIdByCredentials(userDAO);
             if (userId != -1)
             {
-                HttpContext.Response.StatusCode = 200;
                 return new OkObjectResult(new Token(GenerateToken(userId)));
             }
-            HttpContext.Response.StatusCode = 401;
             return new UnauthorizedObjectResult(new Error("Wrong credentials"));
         }
 
