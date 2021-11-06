@@ -35,29 +35,20 @@ namespace project_backend.Controllers
         [ProducesErrorResponseType(typeof(Error))]
         public IActionResult Login([FromBody] UserDTO user)
         {
-            try
+            UserDAO userDAO = new UserDAO
             {
-                UserDAO userDAO = new UserDAO
-                {
-                    Email = user.Email,
-                    Password = user.Password
-                };
+                Email = user.Email,
+                Password = user.Password,
+            };
 
-                int userId = _userProvider.getUserIdByCredentials(userDAO);
-                if (userId != -1)
-                {
-                    HttpContext.Response.StatusCode = 200;
-                    return new OkObjectResult(new Token(GenerateToken(userId)));
-                }
-                HttpContext.Response.StatusCode = 401;
-                return new UnauthorizedObjectResult(new Error("Wrong credentials"));
-            }
-            catch (Exception e)
+            int userId = _userProvider.getUserIdByCredentials(userDAO);
+            if (userId != -1)
             {
-                HttpContext.Response.StatusCode = 500;
-                return new UnauthorizedObjectResult(new Error("Internal Server Error"));
+                HttpContext.Response.StatusCode = 200;
+                return new OkObjectResult(new Token(GenerateToken(userId)));
             }
-
+            HttpContext.Response.StatusCode = 401;
+            return new UnauthorizedObjectResult(new Error("Wrong credentials"));
         }
 
         private static string GenerateToken(int userId)
