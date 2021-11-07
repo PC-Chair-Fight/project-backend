@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
     - name: Run .NET Code Analysis
       uses: dotnet/code-analysis@v1
       id: code-analysis
@@ -24,8 +26,6 @@ jobs:
         solution: project-backend.sln
         all-categories: all
         build-breaking: true
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
     - name: Test
