@@ -7,4 +7,4 @@ build_property.PublishSingleFile =
 build_property.IncludeAllContentForSelfExtract = 
 build_property._SupportedPlatformList = Android,iOS,Linux,macOS,Windows
 build_property.RootNamespace = project_backend.Test
-build_property.ProjectDir = D:\Facultate\semestru_5\PC\project-backend\project-backend.Test\
+build_property.ProjectDir = D:\Facultate\semestru_5\test\project-backend\project-backend.Test\
