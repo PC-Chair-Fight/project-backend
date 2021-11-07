@@ -28,27 +28,32 @@ Afterwards, you can access the other request too, and it will not return 401 any
 
 File structure:
 
-- **Properties/** - contains the launchSettings for the app, which contains the settings and environment variables of the applcation.
+- **./project-backend/Properties/** - contains the launchSettings for the app, which contains the settings and environment variables of the applcation.
 	If some variable should be provided at startup to the application,
 	then this is where it should be added, as an environment variable, under the `Development` profile environments
-- **wwwroot/** - contains static resources of the application (such as images)
-- **Attributes/** - directory for custom attributes
-- **Controllers/** - directory that contains the REST controllers. There is already an example created, with JWT authorization (both creating and verifying a JWT token)
-- **Middlewares/** - directory for custom middlewares.
-- **Models/** - directory for the models of our app. I suggest splitting this into even more directories, as it would make sense (user models should go in a User directory, etc.)
-- **Repos/** - directory for repositories. All of them will have interfaces and implementations, so please split the two accordingly
-- **Utils/** - directory for other utilities.
+- **./project-backend/wwwroot/** - contains static resources of the application (such as images)
+- **./project-backend/Attributes/** - directory for custom attributes
+- **./project-backend/Controllers/** - directory that contains the REST controllers. There is already an example created, with JWT authorization (both creating and verifying a JWT token)
+- **./project-backend/Middlewares/** - directory for custom middlewares.
+- **./project-backend/Models/** - directory for the models of our app. I suggest splitting this into even more directories, as it would make sense (user models should go in a User directory, etc.)
+- **./project-backend/Repos/** - directory for repositories. All of them will have interfaces and implementations, so please split the two accordingly
+- **./project-backend/Utils/** - directory for other utilities.
+- **./project-backend/appsettings.json** - extra app settings. These will be loaded in the "Configuration" object, which can be accessed in Startup.cs and 
+	every controller if it is injected (IConfiguration ...) like a dictionary (var hosts = Configuration["AllowedHosts"])
+- **./project-backend/Program.cs** - the "main" of our program
+- **./project-backend/Startup.cs** - the class that is initialized in Program.cs, and where all the services and middlewares are defined. 
+	This acts more like a "main" than Program.cs, since Program.cs only initializes this file and then this actually runs our server
+- **./project-backend.Test/ControllerTests** - tests for the controller classes. 
 - **.editorconfig** - file that contains code style rules
 - **.gitignore** - I guess you know what this does
-- **appsettings.json** - extra app settings. These will be loaded in the "Configuration" object, which can be accessed in Startup.cs and 
-	every controller if it is injected (IConfiguration ...) like a dictionary (var hosts = Configuration["AllowedHosts"])
-- **Program.cs** - the "main" of our program
 - **README.md** - well.. hello there, this is me! :)
-- **Startup.cs** - the class that is initialized in Program.cs, and where all the services and middlewares are defined. 
-	This acts more like a "main" than Program.cs, since Program.cs only initializes this file and then this actually runs our server
 
 
 Other directories/files can be created at will, as long as they have a well defined purpose
+
+### Tests
+
+Tests should be created inside project-backend.Test project. They will have the attribute ```[Trait("Category", "<Category>")]```, where the category should be either unit or intergration, depending on the type of test 
 
 # Version Control
 
