@@ -31,7 +31,7 @@ namespace project_backend.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(Token), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
-        public IActionResult Login([FromBody] LoginRequestQueryObject user)
+        public IActionResult Login([FromBody] LoginQueryObject user)
         {
 
             var userId = _userProvider.getUserIdByCredentials(user.Email, user.Password);
