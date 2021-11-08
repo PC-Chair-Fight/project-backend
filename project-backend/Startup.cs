@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Providers.UserProvider;
 using project_backend.Repos;
 using System;
 using System.IO;
@@ -34,6 +35,8 @@ namespace project_backend
             {
                 options.UseInMemoryDatabase("InMemoryDb");
             });
+
+            services.AddTransient<IUserProvider, UserProvider>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -69,9 +72,9 @@ namespace project_backend
                 };
                 c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {securityScheme, new string[] { }}
-    });
+                    {
+                        {securityScheme, new string[] { }}
+                    });
             });
         }
 

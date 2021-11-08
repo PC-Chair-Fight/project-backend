@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using project_backend.Models;
-using project_backend.Models.User;
-using project_backend.Providers;
-using project_backend.Repos;
+using project_backend.Models.UserController.Login;
+using project_backend.Providers.UserProvider;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -17,36 +16,30 @@ namespace project_backend.Controllers
 
     [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
-        private readonly UserProvider _userProvider;
+        private readonly ILogger<AuthController> _logger;
+        private readonly IUserProvider _userProvider;
 
-        public UserController(ILogger<UserController> logger, DatabaseContext databaseContext)
+        public AuthController(ILogger<AuthController> logger, IUserProvider userProvider)
         {
             _logger = logger;
-            _userProvider = new UserProvider(databaseContext);
+            _userProvider = userProvider;
         }
 
         [HttpPost]
-        [Route("login")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(Token), (int)HttpStatusCode.OK)]
-        [ProducesErrorResponseType(typeof(Error))]
-        public IActionResult Login([FromBody] UserDTO user)
+        [ProducesResponseType(typeof(Token), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+        public IActionResult Login([FromBody] LoginQueryObject user)
         {
-            UserDAO userDAO = new UserDAO
-            {
-                Email = user.Email,
-                Password = user.Password,
-            };
 
-            int userId = _userProvider.getUserIdByCredentials(userDAO);
+            var userId = _userProvider.getUserIdByCredentials(user.Email, user.Password);
             if (userId != -1)
             {
-                return new OkObjectResult(new Token(GenerateToken(userId)));
+                return Ok(new Token(GenerateToken(userId)));
             }
-            return new UnauthorizedObjectResult(new Error("Wrong credentials"));
+            return Unauthorized(new Error("Wrong credentials"));
         }
 
         private static string GenerateToken(int userId)
@@ -57,7 +50,7 @@ namespace project_backend.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier,userId.ToString()),
+                    new Claim("Id", userId.ToString()),
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddDays(30),
