@@ -1,11 +1,10 @@
-﻿using project_backend.Models.User;
-using project_backend.Repos;
+﻿using project_backend.Repos;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace project_backend.Providers
+namespace project_backend.Providers.UserProvider
 {
-    public class UserProvider
+    public class UserProvider : IUserProvider
     {
         private readonly DatabaseContext _dbContext;
 
@@ -14,12 +13,12 @@ namespace project_backend.Providers
             _dbContext = databaseContext;
         }
 
-        public int getUserIdByCredentials(UserDAO DaoUser)
+        public int getUserIdByCredentials(string email, string password)
         {
             var query = from user in _dbContext.Users
-                        where user.Email == DaoUser.Email && user.Password == DaoUser.Password
+                        where user.Email == email && user.Password == password
                         select user.Id;
-            List<int> result = query.ToList<int>();
+            List<int> result = query.ToList();
             return result.Count != 0 ? result[0] : -1;
         }
     }

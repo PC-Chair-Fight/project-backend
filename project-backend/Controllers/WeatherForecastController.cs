@@ -50,7 +50,7 @@ namespace project_backend.Controllers
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(typeof(Token), (int)HttpStatusCode.OK)]
-        public Token Get()
+        public IActionResult Get()
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"));
@@ -66,7 +66,7 @@ namespace project_backend.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Token(tokenHandler.WriteToken(token));
+            return Ok(new Token(tokenHandler.WriteToken(token)));
         }
     }
 
