@@ -17,7 +17,17 @@ namespace project_backend.Providers.UserProvider
 
         public int createUser(string firstName, string lastName, DateTime dateOfBirth, string email, string password)
         {
-            UserDAO user = new UserDAO
+            var findUserByEmailQuery = from user in _dbContext.Users
+                                       where user.Email == email
+                                       select user.Id;
+
+            List<int> result = findUserByEmailQuery.ToList();
+            if (result.Count != 0)
+            {
+                return -1;
+            }
+
+            UserDAO userDAO = new UserDAO
             {
                 FirstName = firstName,
                 LastName = lastName,
@@ -25,9 +35,9 @@ namespace project_backend.Providers.UserProvider
                 Email = email,
                 Password = password
             };
-            _dbContext.Users.Add(user);
+            _dbContext.Users.Add(userDAO);
             _dbContext.SaveChanges();
-            return user.Id;
+            return userDAO.Id;
         }
 
         public int getUserIdByCredentials(string email, string password)
