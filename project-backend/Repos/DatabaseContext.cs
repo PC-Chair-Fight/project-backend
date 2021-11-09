@@ -11,13 +11,6 @@ namespace project_backend.Repos
 
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<UserDAO>()
-                .HasIndex(user => user.Email)
-                .IsUnique();
-        }
-
         //public DbSet<WeatherForecast> Forecasts { get; set; }
         public DbSet<UserDAO> Users { get; set; }
         public DbSet<JobDAO> Jobs { get; set; }

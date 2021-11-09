@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project_backend.Models.User
 {
     [Table("users")]
+    [Index(nameof(Email), IsUnique = true)]
     public class UserDAO
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using project_backend.Models;
+using project_backend.Models.AuthController.Register;
 using project_backend.Models.UserController.Login;
 using project_backend.Providers.UserProvider;
 using System;
@@ -15,7 +16,7 @@ namespace project_backend.Controllers
 {
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -40,6 +41,20 @@ namespace project_backend.Controllers
                 return Ok(new Token(GenerateToken(userId)));
             }
             return Unauthorized(new Error("Wrong credentials"));
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(Token), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+        public IActionResult Register([FromBody] RegisterQueryObject user)
+        {
+            var userId = _userProvider.createUser(user.FirstName, user.LastName, user.DateOfBirth, user.Email, user.Password);
+            if (userId != -1)
+            {
+                return Ok(new Token(GenerateToken(userId)));
+            }
+            return Conflict(new Error("Email already exists"));
         }
 
         private static string GenerateToken(int userId)
