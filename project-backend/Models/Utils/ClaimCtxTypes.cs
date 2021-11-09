@@ -1,7 +1,20 @@
 ﻿namespace project_backend.Models.Utils
 {
-    public static class ClaimCtxTypes
+    public enum ClaimCtxTypes
     {
-        public const string Id = "Id";
+        Id
+    }
+
+    public static class ClaimCtxTypesExtension
+    {
+        public static string ToString(this ClaimCtxTypes claim)
+        {
+            return claim switch
+            {
+                ClaimCtxTypes.Id => "Id",
+                _ => ""
+            };
+        }
+
     }
 }

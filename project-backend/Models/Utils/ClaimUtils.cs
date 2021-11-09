@@ -6,9 +6,9 @@ namespace project_backend.Models.Utils
 {
     public static class ClaimUtils
     {
-        public static Claim getUserIdClaim(HttpContext httpContext)
+        public static Claim GetUserIdClaim(HttpContext httpContext)
         {
-            return (httpContext.User.Identity as ClaimsIdentity).Claims.First(claim => claim.Type == ClaimCtxTypes.Id);
+            return (httpContext.User.Identity as ClaimsIdentity).Claims.First(claim => claim.Type == ClaimCtxTypes.Id.ToString());
         }
     }
 }
