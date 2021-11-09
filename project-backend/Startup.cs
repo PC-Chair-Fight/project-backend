@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Providers.JobsProvider;
 using project_backend.Providers.UserProvider;
 using project_backend.Repos;
 using System;
@@ -37,6 +38,8 @@ namespace project_backend
             });
 
             services.AddTransient<IUserProvider, UserProvider>();
+            services.AddTransient<IJobsProvider, JobsProvider>();
+
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

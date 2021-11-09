@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project_backend.Models.User
@@ -15,5 +16,7 @@ namespace project_backend.Models.User
         public DateTime DateOfBirth { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public ICollection<JobDAO> Jobs { get; set; }
+
     }
 }
