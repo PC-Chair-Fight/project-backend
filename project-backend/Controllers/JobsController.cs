@@ -28,7 +28,6 @@ namespace project_backend.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(AddJobResponseObject), StatusCodes.Status201Created)]
         public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
         {
 
