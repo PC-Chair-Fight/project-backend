@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using project_backend.Models.Job;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

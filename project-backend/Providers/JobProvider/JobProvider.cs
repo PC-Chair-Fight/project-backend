@@ -13,5 +13,20 @@ namespace project_backend.Providers.JobProvider
 
         public IQueryable<JobDAO> QueryJobs() =>
             _dbContext.Jobs.AsQueryable();
+
+        public JobDAO AddJob(string name, string description, int userId)
+        {
+            JobDAO newJob = new JobDAO
+            {
+                Name = name,
+                Description = description,
+                UserId = userId
+            };
+
+            _dbContext.Jobs.Add(newJob);
+            _dbContext.SaveChanges();
+
+            return newJob;
+        }
     }
 }

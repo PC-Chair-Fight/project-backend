@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using project_backend.Models;
 using project_backend.Models.Job;
 using project_backend.Models.JobController.GetJobs;
+using project_backend.Models.JobController.AddJob;
+using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
 using System;
@@ -67,6 +69,28 @@ namespace project_backend.Controllers
             {
                 jobs = returnValue
             });
+        }
+
+        [HttpPost]
+        [Route("add")]
+        public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
+        {
+
+            var userIdClaim = HttpContext.User.GetUserIdClaim();
+
+            var newJob = _jobProvider.AddJob(job.Name, job.Description, int.Parse(userIdClaim.Value));
+
+            var response = new AddJobResponseObject
+            {
+                UserId = newJob.UserId,
+                PostDate = newJob.PostDate,
+                Description = newJob.Description,
+                Done = newJob.Done,
+                Id = newJob.Id,
+                Name = newJob.Name,
+
+            };
+            return response;
         }
     }
 

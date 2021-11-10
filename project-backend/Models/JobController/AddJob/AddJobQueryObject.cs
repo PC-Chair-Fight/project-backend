@@ -1,13 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace project_backend.Models.JobsController.AddJob
+namespace project_backend.Models.JobController.AddJob
 {
     public class AddJobQueryObject
     {
-        [Required]
         public string Name { get; set; }
-
-        [Required]
         public string Description { get; set; }
     }
 }
