@@ -50,53 +50,47 @@ namespace project_backend.Controllers
                     var value = query.FilterValues[i];
                     var exact = query.ExactFilters[i];
 
-                    switch (field)
+                    jobs = field switch
                     {
-                        case GetJobsQueryObject.FilterField.Id: // look for id, ignore exact
-                            int searchedId = int.Parse(value);
-                            jobs = jobs.Where(j => j.Id == searchedId);
-                            break;
-                        case GetJobsQueryObject.FilterField.Name:
-                            jobs = exact ?
+                        // look for id, ignore exact
+                        GetJobsQueryObject.FilterField.Id => jobs.Where(j => j.Id == int.Parse(value)),
+
+                        GetJobsQueryObject.FilterField.Name => exact ?
                                 jobs.Where(j => j.Name == value) :
-                                jobs.Where(j => j.Name.Contains(value));
-                            break;
-                        case GetJobsQueryObject.FilterField.Description:
-                            jobs = exact ?
+                                jobs.Where(j => j.Name.Contains(value)),
+
+                        GetJobsQueryObject.FilterField.Description => exact ?
                                 jobs.Where(j => j.Description == value) :
-                                jobs.Where(j => j.Description.Contains(value));
-                            break;
-                        case GetJobsQueryObject.FilterField.Done: // filter by Done, ignore exact
-                            bool searchedDone = bool.Parse(value);
-                            jobs = jobs.Where(j => j.Done == searchedDone);
-                            break;
-                    }
+                                jobs.Where(j => j.Description.Contains(value)),
+
+                        // filter by Done, ignore exact
+                        GetJobsQueryObject.FilterField.Done => jobs = jobs.Where(j => j.Done == bool.Parse(value)),
+
+                        _ => jobs
+                    };
                 }
 
             if (query.OrderBy != null)
-                switch (query.OrderBy)
+                jobs = query.OrderBy switch
                 {
-                    case GetJobsQueryObject.OrderField.Id:
-                        jobs = query.OrderAscending ?? true ?
+                    GetJobsQueryObject.OrderField.Id => query.OrderAscending ?? true ?
                             jobs.OrderBy(j => j.Id) :
-                            jobs.OrderByDescending(j => j.Id);
-                        break;
-                    case GetJobsQueryObject.OrderField.Name:
-                        jobs = query.OrderAscending ?? true ?
+                            jobs.OrderByDescending(j => j.Id),
+
+                    GetJobsQueryObject.OrderField.Name => query.OrderAscending ?? true ?
                             jobs.OrderBy(j => j.Name) :
-                            jobs.OrderByDescending(j => j.Name);
-                        break;
-                    case GetJobsQueryObject.OrderField.Description:
-                        jobs = query.OrderAscending ?? true ?
+                            jobs.OrderByDescending(j => j.Name),
+
+                    GetJobsQueryObject.OrderField.Description => query.OrderAscending ?? true ?
                             jobs.OrderBy(j => j.Description) :
-                            jobs.OrderByDescending(j => j.Description);
-                        break;
-                    case GetJobsQueryObject.OrderField.PostDate:
-                        jobs = query.OrderAscending ?? true ?
+                            jobs.OrderByDescending(j => j.Description),
+
+                    GetJobsQueryObject.OrderField.PostDate => query.OrderAscending ?? true ?
                             jobs.OrderBy(j => j.PostDate) :
-                            jobs.OrderByDescending(j => j.PostDate);
-                        break;
-                }
+                            jobs.OrderByDescending(j => j.PostDate),
+
+                    _ => jobs
+                };
             else
                 jobs = jobs.OrderBy(j => j.Id);
 
