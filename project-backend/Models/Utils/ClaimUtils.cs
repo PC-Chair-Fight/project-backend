@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Linq;
 
 namespace project_backend.Models.Utils
 {
     public static class ClaimUtils
     {
-        public static Claim GetUserIdClaim(HttpContext httpContext)
+        public static Claim GetUserIdClaim(this ClaimsPrincipal user)
         {
-            return (httpContext.User.Identity as ClaimsIdentity).Claims.First(claim => claim.Type == ClaimCtxTypes.Id.ToString());
+            return (user.Identity as ClaimsIdentity).Claims.First(claim => claim.Type == ClaimCtxTypes.Id.ToString());
         }
     }
 }

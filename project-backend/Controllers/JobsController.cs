@@ -31,7 +31,7 @@ namespace project_backend.Controllers
         public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
         {
 
-            var userIdClaim = ClaimUtils.GetUserIdClaim(HttpContext);
+            var userIdClaim = HttpContext.User.GetUserIdClaim();
 
             var newJob = _jobsProvider.AddJob(job.Name, job.Description, int.Parse(userIdClaim.Value));
 
