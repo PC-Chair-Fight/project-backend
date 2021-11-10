@@ -1,3 +1,5 @@
+using FluentValidation.AspNetCore;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,13 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using project_backend.Providers.JobsProvider;
+using project_backend.Models.Validators.JobController.GetJobs;
+using project_backend.Providers.JobProvider;
 using project_backend.Providers.UserProvider;
 using project_backend.Repos;
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace project_backend
 {
@@ -30,7 +34,9 @@ namespace project_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>());
 
             services.AddDbContext<DatabaseContext>(options =>
             {
@@ -38,8 +44,7 @@ namespace project_backend
             });
 
             services.AddTransient<IUserProvider, UserProvider>();
-            services.AddTransient<IJobsProvider, JobsProvider>();
-
+            services.AddTransient<IJobProvider, JobProvider>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -58,7 +63,6 @@ namespace project_backend
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "project_backend", Version = "v1" });
-
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",
@@ -76,9 +80,10 @@ namespace project_backend
                 c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
-                        {securityScheme, new string[] { }}
+                        {securityScheme, Array.Empty<string>()}
                     });
             });
+            services.AddFluentValidationRulesToSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

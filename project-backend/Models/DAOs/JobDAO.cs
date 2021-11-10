@@ -1,8 +1,9 @@
-﻿using System;
-using System.ComponentModel;
+using project_backend.Models.User;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace project_backend.Models.User
+namespace project_backend.Models.Job
 {
     [Table("jobs")]
     public class JobDAO
@@ -11,10 +12,11 @@ namespace project_backend.Models.User
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateTime DateOfPost { get; set; }
-        [DefaultValue(false)]
-        public bool Done { get; set; }
-        public int AuthorId { get; set; }
-        public UserDAO Author { get; set; }
+        public DateTime PostDate { get; set; } = DateTime.Now;
+        public bool Done { get; set; } = false;
+
+        [Required]
+        public int UserId { get; set; }
+        public UserDAO User { get; set; }
     }
 }

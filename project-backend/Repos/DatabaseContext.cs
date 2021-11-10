@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using project_backend.Models.Job;
 using project_backend.Models.User;
 
 namespace project_backend.Repos
@@ -13,6 +14,5 @@ namespace project_backend.Repos
         //public DbSet<WeatherForecast> Forecasts { get; set; }
         public DbSet<UserDAO> Users { get; set; }
         public DbSet<JobDAO> Jobs { get; set; }
-
     }
 }
