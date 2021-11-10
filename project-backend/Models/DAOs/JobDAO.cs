@@ -12,8 +12,8 @@ namespace project_backend.Models.Job
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateTime PostDate { get; set; }
-        public bool Done { get; set; }
+        public DateTime PostDate { get; set; } = DateTime.Now;
+        public bool Done { get; set; } = false;
 
         [Required]
         public int UserId { get; set; }
