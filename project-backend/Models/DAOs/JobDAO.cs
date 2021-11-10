@@ -1,4 +1,4 @@
-﻿using project_backend.Models.User;
+using project_backend.Models.User;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

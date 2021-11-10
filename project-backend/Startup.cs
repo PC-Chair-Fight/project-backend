@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Models.Validators.JobController.AddJob;
 using project_backend.Models.Validators.JobController.GetJobs;
 using project_backend.Providers.JobProvider;
 using project_backend.Providers.UserProvider;
@@ -36,7 +37,9 @@ namespace project_backend
             services.AddCors();
             services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
-                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>());
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>());
+
 
             services.AddDbContext<DatabaseContext>(options =>
             {
