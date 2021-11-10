@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using project_backend.Controllers;
@@ -8,119 +7,75 @@ using project_backend.Models.Job;
 using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.User;
 using project_backend.Providers.JobProvider;
-using project_backend.Repos;
 using System;
-using System.Reflection;
+using System.Linq;
 using System.Security.Claims;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace project_backend.Test.ControllerTests
 {
     [Trait("Category", "Unit")]
-    public class JobControllerTest : IDisposable
+    public class JobControllerTest
     {
         private readonly JobController _controller;
-        private readonly DatabaseContext _dbContext;
 
         public JobControllerTest(ITestOutputHelper output)
         {
-            var type = output.GetType();
-            var testMember = type.GetField("test", BindingFlags.Instance | BindingFlags.NonPublic);
-            var test = (ITest)testMember.GetValue(output);
-
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseInMemoryDatabase(test.DisplayName) // use the name of the test, because otherwise the db is used simultaneously by multiple threads
-                .Options;
-            _dbContext = new DatabaseContext(options);
-
-            var user1 = new UserDAO
+            var users = new UserDAO[]
             {
-                Email = "user1@gmail.com",
-                DateOfBirth = new DateTime(2020, 2, 20),
-                FirstName = "User1",
-                LastName = "User1",
-                Password = ""
+                new UserDAO
+                {
+                    Id = 1,
+                    Email = "user1@gmail.com",
+                    DateOfBirth = new DateTime(2020, 2, 20),
+                    FirstName = "User1",
+                    LastName = "User1",
+                    Password = ""
+                },
+                new UserDAO
+                {
+                    Id = 2,
+                    Email = "user2@gmail.com",
+                    DateOfBirth = new DateTime(2021, 1, 1),
+                    FirstName = "User2",
+                    LastName = "User2",
+                    Password = ""
+                }
             };
 
-            var user2 = new UserDAO
-            {
-                Email = "user2@gmail.com",
-                DateOfBirth = new DateTime(2021, 1, 1),
-                FirstName = "User2",
-                LastName = "User2",
-                Password = ""
-            };
+            var jobProviderMock = new Mock<IJobProvider>();
 
-            _dbContext.Users.AddRange(user1, user2);
-            _dbContext.SaveChanges();
-
-            _dbContext.Jobs.AddRange(
+            jobProviderMock.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
+                .Select(i =>
                     new JobDAO
                     {
-                        Name = "Job1",
-                        Description = "Job1Desc",
-                        User = user1,
-                        PostDate = new DateTime(2020, 3, 20),
-                        Done = false,
-                    },
-                    new JobDAO
-                    {
-                        Name = "Job2",
-                        Description = "Job2Desc",
-                        User = user2,
-                        PostDate = new DateTime(2021, 2, 1),
-                        Done = true,
-                    },
-                    new JobDAO
-                    {
-                        Name = "Job3",
-                        Description = "Job3Desc",
-                        User = user1,
-                        PostDate = new DateTime(2020, 3, 21),
-                        Done = false,
-                    },
-                    new JobDAO
-                    {
-                        Name = "Job4",
-                        Description = "Job4Desc",
-                        User = user2,
-                        PostDate = new DateTime(2021, 2, 2),
-                        Done = true,
-                    },
-                    new JobDAO
-                    {
-                        Name = "Job5",
-                        Description = "Job5Desc",
-                        User = user1,
-                        PostDate = new DateTime(2020, 3, 21),
-                        Done = false,
-                    },
-                    new JobDAO
-                    {
-                        Name = "Job5",
-                        Description = "Job5Desc",
-                        User = user1,
-                        PostDate = new DateTime(2020, 3, 22),
-                        Done = false,
+                        Name = $"Job{i + 1}",
+                        Description = $"Job{i + 1}Desc",
+                        User = users[i % 2],
+                        UserId = users[i % 2].Id,
+                        PostDate = i % 2 == 0 ? new DateTime(2020, 3, 20 + i / 2) : new DateTime(2021, 2, 1 + i / 2),
+                        Done = i % 2 != 0,
                     }
-                );
-            _dbContext.SaveChanges();
+                )
+                .Append(new JobDAO
+                {
+                    Name = "Job5",
+                    Description = "Job5Desc",
+                    User = users[0],
+                    UserId = users[0].Id,
+                    PostDate = new DateTime(2020, 3, 21),
+                    Done = false,
+                })
+                .AsQueryable());
 
-            _controller = new JobController(NullLogger<JobController>.Instance, new JobProvider(_dbContext));
+            _controller = new JobController(NullLogger<JobController>.Instance, jobProviderMock.Object);
 
             var contextMock = new Mock<HttpContext>();
-            contextMock.Setup(x => x.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("Id", user1.Id.ToString()) })));
+            contextMock.Setup(x => x.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("Id", users[0].Id.ToString()) })));
             _controller.ControllerContext.HttpContext = contextMock.Object;
         }
 
-        public void Dispose()
-        {
-            _dbContext.Dispose();
-            GC.SuppressFinalize(this);
-        }
-        
 
         [Fact]
         public void TestGetJobs_OneAnyUser()
@@ -216,10 +171,10 @@ namespace project_backend.Test.ControllerTests
             {
                 Index = 0,
                 Count = 6,
-                OrderBy = new GetJobsQueryObject.OrderField[] 
-                { 
-                    GetJobsQueryObject.OrderField.Name, 
-                    GetJobsQueryObject.OrderField.PostDate 
+                OrderBy = new GetJobsQueryObject.OrderField[]
+                {
+                    GetJobsQueryObject.OrderField.Name,
+                    GetJobsQueryObject.OrderField.PostDate
                 },
                 Ascending = new bool[] { true, false },
             }) as OkObjectResult;
