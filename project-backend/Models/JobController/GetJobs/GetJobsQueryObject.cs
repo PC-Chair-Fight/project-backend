@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace project_backend.Models.JobController.GetJobs
 {
@@ -6,8 +7,8 @@ namespace project_backend.Models.JobController.GetJobs
     {
         public bool? ByCurrentUserOnly;
 
-        public OrderField? OrderBy { get; set; }
-        public bool? OrderAscending { get; set; }
+        public OrderField[] OrderBy { get; set; }
+        public bool[] Ascending { get; set; }
 
         public FilterField[] FilterFields { get; set; }
         public string[] FilterValues { get; set; }
@@ -18,6 +19,8 @@ namespace project_backend.Models.JobController.GetJobs
 
         public DateTime? OlderThan { get; set; }
         public DateTime? NewerThan { get; set; }
+
+        public override string ToString() => JsonConvert.SerializeObject(this);
 
         public enum OrderField
         {

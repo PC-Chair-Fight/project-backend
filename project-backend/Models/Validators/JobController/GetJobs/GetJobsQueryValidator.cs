@@ -9,6 +9,7 @@ namespace project_backend.Models.Validators.JobController.GetJobs
         public GetJobsQueryValidator()
         {
             const string filtersErrorMessage = "FilterValues, ExactFilters, FilterFields must be all null or they must have the same length";
+            const string orderByErrorMessage = "OrderBy and Ascending must both be null or they must have the same length";
 
             // all filters are null or none is
             RuleFor(x => x.FilterValues).NotEmpty().Unless(x => x.FilterFields == null && x.ExactFilters == null).WithMessage(filtersErrorMessage);
@@ -21,19 +22,24 @@ namespace project_backend.Models.Validators.JobController.GetJobs
                 .Equal(x => x.ExactFilters.Length).WithMessage(filtersErrorMessage)
                 .When(x => x.FilterValues != null && x.FilterFields != null && x.ExactFilters != null);
 
+            // similar checks for OrderBy and Ascending
+            RuleFor(x => x.OrderBy).NotEmpty().Unless(x => x.Ascending == null).WithMessage(orderByErrorMessage);
+            RuleFor(x => x.Ascending).NotEmpty().Unless(x => x.OrderBy == null).WithMessage(orderByErrorMessage);
+            RuleFor(x => x.OrderBy.Length).Equal(x => x.Ascending.Length).WithMessage(orderByErrorMessage);
+
             RuleForEach(x => x.FilterValues.Zip(x.FilterFields))
                 .Must(x =>
                 {
                     var field = x.Second;
                     var value = x.First;
-                    switch (field)
+                    return field switch
                     {
-                        case GetJobsQueryObject.FilterField.Id: // must be able to parse int
-                            return int.TryParse(value, out int dummyInt);
-                        case GetJobsQueryObject.FilterField.Done: // must be able to parse bool
-                            return bool.TryParse(value, out bool dummyBool);
-                    }
-                    return true;
+                    // must be able to parse int
+                    GetJobsQueryObject.FilterField.Id => int.TryParse(value, out int dummyInt),
+                    // must be able to parse bool
+                    GetJobsQueryObject.FilterField.Done => bool.TryParse(value, out bool dummyBool),
+                    _ => true
+                    };
                 })
                 .WithMessage("Filter values must be string representations of values of their respective types");
 
@@ -45,9 +51,6 @@ namespace project_backend.Models.Validators.JobController.GetJobs
 
             RuleFor(x => x.Index).NotEmpty().GreaterThanOrEqualTo(0);
             RuleFor(x => x.Count).NotEmpty().GreaterThan(0);
-
-            RuleFor(x => x.OrderBy).NotEmpty().When(x => x.OrderAscending != null)
-                .WithMessage("If providing OrderAscending, OrderBy must also be given");
         }
     }
 }

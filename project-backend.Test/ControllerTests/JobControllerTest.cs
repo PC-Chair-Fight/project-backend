@@ -21,8 +21,8 @@ namespace project_backend.Test.ControllerTests
     [Trait("Category", "Unit")]
     public class JobControllerTest : IDisposable
     {
-        private JobController _controller;
-        private DatabaseContext _dbContext;
+        private readonly JobController _controller;
+        private readonly DatabaseContext _dbContext;
 
         public JobControllerTest(ITestOutputHelper output)
         {
@@ -94,6 +94,14 @@ namespace project_backend.Test.ControllerTests
                         Name = "Job5",
                         Description = "Job5Desc",
                         User = user1,
+                        PostDate = new DateTime(2020, 3, 21),
+                        Done = false,
+                    },
+                    new JobDAO
+                    {
+                        Name = "Job5",
+                        Description = "Job5Desc",
+                        User = user1,
                         PostDate = new DateTime(2020, 3, 22),
                         Done = false,
                     }
@@ -107,7 +115,12 @@ namespace project_backend.Test.ControllerTests
             _controller.ControllerContext.HttpContext = contextMock.Object;
         }
 
-        public void Dispose() => _dbContext.Dispose();
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+            GC.SuppressFinalize(this);
+        }
+        
 
         [Fact]
         public void TestGetJobs_OneAnyUser()
@@ -156,8 +169,8 @@ namespace project_backend.Test.ControllerTests
                 Count = 2,
                 NewerThan = new DateTime(2021, 2, 1),
                 OlderThan = new DateTime(2021, 2, 2),
-                OrderBy = GetJobsQueryObject.OrderField.PostDate,
-                OrderAscending = false
+                OrderBy = new GetJobsQueryObject.OrderField[] { GetJobsQueryObject.OrderField.PostDate },
+                Ascending = new bool[] { false }
             }) as OkObjectResult;
 
             Assert.NotNull(okResult);
@@ -194,6 +207,36 @@ namespace project_backend.Test.ControllerTests
 
             Assert.Equal("Job2", resultObject.jobs[0].Name);
             Assert.Equal("Job4", resultObject.jobs[1].Name);
+        }
+
+        [Fact]
+        public void TestGetJobs_SixJobsOrderByNameAscThenDateDesc()
+        {
+            var okResult = _controller.GetJobs(new GetJobsQueryObject
+            {
+                Index = 0,
+                Count = 6,
+                OrderBy = new GetJobsQueryObject.OrderField[] 
+                { 
+                    GetJobsQueryObject.OrderField.Name, 
+                    GetJobsQueryObject.OrderField.PostDate 
+                },
+                Ascending = new bool[] { true, false },
+            }) as OkObjectResult;
+
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
+
+            var resultObject = okResult.Value as GetJobsResponseObject;
+            Assert.NotNull(resultObject);
+            Assert.NotNull(resultObject.jobs);
+            Assert.True(resultObject.jobs.Length == 6);
+
+            Assert.Equal("Job5", resultObject.jobs[4].Name);
+            Assert.Equal("Job5", resultObject.jobs[5].Name);
+
+            Assert.Equal(new DateTime(2020, 3, 22), resultObject.jobs[4].PostDate);
+            Assert.Equal(new DateTime(2020, 3, 21), resultObject.jobs[5].PostDate);
         }
     }
 }
