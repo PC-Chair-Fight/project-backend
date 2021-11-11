@@ -24,7 +24,10 @@ namespace project_backend
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+
+        IWebHostEnvironment WebHostEnvironment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
         }
@@ -40,11 +43,20 @@ namespace project_backend
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>());
 
-
-            services.AddDbContext<DatabaseContext>(options =>
+            if (this.WebHostEnvironment.IsProduction())
             {
-                options.UseInMemoryDatabase("InMemoryDb");
-            });
+                services.AddDbContext<DatabaseContext>(options =>
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("ProductionDbConnection"));
+                });
+            }
+            else
+            {
+                services.AddDbContext<DatabaseContext>(options =>
+                {
+                    options.UseInMemoryDatabase("InMemoryDb");
+                });
+            }
 
             services.AddTransient<IUserProvider, UserProvider>();
             services.AddTransient<IJobProvider, JobProvider>();
