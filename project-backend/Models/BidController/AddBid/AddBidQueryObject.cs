@@ -4,6 +4,5 @@
     {
         public float Sum { get; set; }
         public int JobId { get; set; }
-
     }
 }
