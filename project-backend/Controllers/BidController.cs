@@ -33,13 +33,11 @@ namespace project_backend.Controllers
         [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
         public IActionResult AddBid([FromBody] AddBidQueryObject bid)
         {
-
             var userIdClaim = HttpContext.User.GetUserIdClaim();
             BidDAO newBid;
             try
             {
                 newBid = _bidProvider.AddBid(bid.Sum, int.Parse(userIdClaim.Value), bid.JobId);
-
             }
             catch (NotQualifiedException ex)
             {
@@ -64,18 +62,12 @@ namespace project_backend.Controllers
 
         public IActionResult EditBid([FromBody] EditBidQueryObject bid)
         {
-
             var userIdClaim = HttpContext.User.GetUserIdClaim();
             BidDAO newBid;
 
             try
             {
                 newBid = _bidProvider.EditBid(bid.Sum, int.Parse(userIdClaim.Value), bid.BidId);
-
-            }
-            catch (UnauthorizedException ex)
-            {
-                return Unauthorized(new Error(ex.Message));
             }
             catch (ResourceNotFoundException ex)
             {

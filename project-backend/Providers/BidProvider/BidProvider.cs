@@ -48,19 +48,13 @@ namespace project_backend.Providers.BidProvider
                 throw new ResourceNotFoundException("Bid not found");
             }
 
-            if (currentBid.WorkerId == workerId)
-            {
-                BidDAO editedBid = currentBid;
-                editedBid.Sum = sum;
+            BidDAO editedBid = currentBid;
+            editedBid.Sum = sum;
 
-                _dbContext.Bids.Update(editedBid);
-                _dbContext.SaveChanges();
-                return editedBid;
-            }
-            else
-            {
-                throw new UnauthorizedException();
-            }
+            _dbContext.Bids.Update(editedBid);
+            _dbContext.SaveChanges();
+            return editedBid;
+
         }
     }
 }
