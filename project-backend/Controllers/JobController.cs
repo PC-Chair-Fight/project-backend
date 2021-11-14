@@ -9,7 +9,6 @@ using project_backend.Models.JobController.AddJob;
 using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
-using System;
 using System.Linq;
 
 namespace project_backend.Controllers
@@ -72,6 +71,7 @@ namespace project_backend.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("add")]
         public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
         {
