@@ -29,8 +29,8 @@ namespace project_backend.Controllers
 
         [Authorize]
         [HttpPost]
-        [ProducesResponseType(typeof(BidDAO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(AddBidResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
         public IActionResult AddBid([FromBody] AddBidQueryObject bid)
         {
             var userIdClaim = HttpContext.User.GetUserIdClaim();
@@ -39,9 +39,9 @@ namespace project_backend.Controllers
             {
                 newBid = _bidProvider.AddBid(bid.Sum, int.Parse(userIdClaim.Value), bid.JobId);
             }
-            catch (NotQualifiedException ex)
+            catch (NotQualifiedException)
             {
-                return Unauthorized(new Error(ex.Message));
+                return Forbid();
             }
 
             var response = new AddBidResponseObject
@@ -56,8 +56,7 @@ namespace project_backend.Controllers
 
         [Authorize]
         [HttpPut]
-        [ProducesResponseType(typeof(BidDAO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(EditBidResponseObject), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
 
         public IActionResult EditBid([FromBody] EditBidQueryObject bid)
