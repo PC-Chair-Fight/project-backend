@@ -30,7 +30,7 @@ namespace project_backend.Controllers
         [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(AddBidResponseObject), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult AddBid([FromBody] AddBidQueryObject bid)
         {
             var userIdClaim = HttpContext.User.GetUserIdClaim();
