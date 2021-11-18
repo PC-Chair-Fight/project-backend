@@ -9,8 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Models.Validators.BidController.AddBid;
+using project_backend.Models.Validators.BidController.EditJob;
 using project_backend.Models.Validators.JobController.AddJob;
 using project_backend.Models.Validators.JobController.GetJobs;
+using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Providers.UserProvider;
 using project_backend.Repos;
@@ -42,7 +45,10 @@ namespace project_backend
             services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
-                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>());
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<EditBidQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>());
+
 
             if (this.WebHostEnvironment.IsProduction())
             {
@@ -61,6 +67,8 @@ namespace project_backend
 
             services.AddTransient<IUserProvider, UserProvider>();
             services.AddTransient<IJobProvider, JobProvider>();
+            services.AddTransient<IBidProvider, BidProvider>();
+
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
