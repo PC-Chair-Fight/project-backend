@@ -10,6 +10,7 @@ using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
+using System;
 using System.Linq;
 
 namespace project_backend.Controllers
@@ -120,7 +121,7 @@ namespace project_backend.Controllers
                 };
                 return Ok(response);
             }
-            catch (InvalidOperationException exception)
+            catch (InvalidOperationException)
             {
                 return NotFound(new Error("Job with that id doesn't exist!"));
             }
