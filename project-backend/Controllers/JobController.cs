@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
 using project_backend.Models.Job;
-using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.JobController.AddJob;
+using project_backend.Models.JobController.GetJobDetails;
+using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
@@ -91,6 +92,39 @@ namespace project_backend.Controllers
 
             };
             return response;
+        }
+
+        [HttpGet]
+        [Route("details")]
+        [ProducesResponseType(typeof(GetJobDetailsResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+        public IActionResult GetJobDetails(GetJobDetailsQueryObject job)
+        {
+            if (!int.TryParse(User.FindFirst("Id").Value, out var userId))
+            {
+                return Unauthorized(new Error("Not logged in"));
+            }
+            try
+            {
+                var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
+                var response = new GetJobDetailsResponseObject
+                {
+                    Id = requiredJob.Id,
+                    Name = requiredJob.Name,
+                    Description = requiredJob.Description,
+                    PostDate = requiredJob.PostDate,
+                    Done = requiredJob.Done,
+                    Images = requiredJob.Images,
+                };
+                return Ok(response);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return NotFound(new Error("Job with that id doesn't exist!"));
+            }
+
         }
     }
 
