@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using project_backend.Models;
 using project_backend.Models.AuthController.Register;
 using project_backend.Models.UserController.Login;
+using project_backend.Models.Utils;
 using project_backend.Providers.UserProvider;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,6 +22,7 @@ namespace project_backend.Controllers
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IUserProvider _userProvider;
+        //private readonly IWorkerProvider _userProvider;
 
         public AuthController(ILogger<AuthController> logger, IUserProvider userProvider)
         {
@@ -36,9 +38,10 @@ namespace project_backend.Controllers
         {
 
             var userId = _userProvider.getUserIdByCredentials(user.Email, user.Password);
+
             if (userId != -1)
             {
-                return Ok(new Token(GenerateToken(userId)));
+                return Ok(new Token(GenerateToken(userId, UserRoles.User)));
             }
             return Unauthorized(new Error("Wrong credentials"));
         }
@@ -52,12 +55,12 @@ namespace project_backend.Controllers
             var userId = _userProvider.createUser(user.FirstName, user.LastName, user.DateOfBirth, user.Email, user.Password);
             if (userId != -1)
             {
-                return Ok(new Token(GenerateToken(userId)));
+                return Ok(new Token(GenerateToken(userId, UserRoles.User)));
             }
             return Conflict(new Error("Email already exists"));
         }
 
-        private static string GenerateToken(int userId)
+        private static string GenerateToken(int userId, UserRoles userRole)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"));
@@ -66,6 +69,8 @@ namespace project_backend.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("Id", userId.ToString()),
+                    new Claim(ClaimTypes.Role, userRole.ToString()),
+
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddDays(30),

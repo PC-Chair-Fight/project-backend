@@ -88,7 +88,6 @@ namespace project_backend.Controllers
                 Done = newJob.Done,
                 Id = newJob.Id,
                 Name = newJob.Name,
-
             };
             return response;
         }

@@ -27,7 +27,7 @@ namespace project_backend.Controllers
             _bidProvider = bidProvider;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Worker")]
         [HttpPost]
         [ProducesResponseType(typeof(AddBidResponseObject), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -54,11 +54,10 @@ namespace project_backend.Controllers
             return Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Worker")]
         [HttpPut]
         [ProducesResponseType(typeof(EditBidResponseObject), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
-
         public IActionResult EditBid([FromBody] EditBidQueryObject bid)
         {
             var userIdClaim = HttpContext.User.GetUserIdClaim();

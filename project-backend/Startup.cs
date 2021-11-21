@@ -16,6 +16,7 @@ using project_backend.Models.Validators.JobController.GetJobs;
 using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Providers.UserProvider;
+using project_backend.Providers.WorkerApplicationProvider;
 using project_backend.Repos;
 using System;
 using System.IO;
@@ -68,6 +69,8 @@ namespace project_backend
             services.AddTransient<IUserProvider, UserProvider>();
             services.AddTransient<IJobProvider, JobProvider>();
             services.AddTransient<IBidProvider, BidProvider>();
+            services.AddTransient<IWorkerApplicationProvider, WorkerApplicationProvider>();
+
 
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -84,6 +87,7 @@ namespace project_backend
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "project_backend", Version = "v1" });
