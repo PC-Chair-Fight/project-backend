@@ -1,11 +1,10 @@
-using project_backend.Models.Job;
+﻿using project_backend.Models.Job;
 using project_backend.Models.Worker;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project_backend.Models.Bid
 {
-
     [Table("bids")]
     public class BidDAO
     {

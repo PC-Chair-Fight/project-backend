@@ -5,6 +5,7 @@ using Moq;
 using project_backend.Controllers;
 using project_backend.Models.Bid;
 using project_backend.Models.Job;
+using project_backend.Models.JobController;
 using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.JobImage;
@@ -210,7 +211,7 @@ namespace project_backend.Test.ControllerTests
             Assert.NotNull(okResult);
             Assert.Equal(200, okResult.StatusCode);
 
-            var resultObject = okResult.Value as GetJobDetailsResponseObject;
+            var resultObject = okResult.Value as JobResponseObject;
             Assert.NotNull(resultObject);
 
             Assert.Equal("Job2", resultObject.Name);

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
 using project_backend.Models.Job;
+using project_backend.Models.JobController;
 using project_backend.Models.JobController.AddJob;
 using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
@@ -74,15 +75,15 @@ namespace project_backend.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("add")]
-        public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
+        [Route("Add")]
+        public JobResponseObject AddJob([FromBody] AddJobQueryObject job)
         {
 
             var userIdClaim = HttpContext.User.GetUserIdClaim();
 
             var newJob = _jobProvider.AddJob(job.Name, job.Description, int.Parse(userIdClaim.Value));
 
-            var response = new AddJobResponseObject
+            var response = new JobResponseObject
             {
                 UserId = newJob.UserId,
                 PostDate = newJob.PostDate,
@@ -96,28 +97,28 @@ namespace project_backend.Controllers
         }
 
         [HttpGet]
-        [Route("details")]
-        [ProducesResponseType(typeof(GetJobDetailsResponseObject), StatusCodes.Status200OK)]
+        [Route("Details")]
+        [ProducesResponseType(typeof(JobResponseObject), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
-        public IActionResult GetJobDetails(GetJobDetailsQueryObject job)
+        public IActionResult GetJobDetails([FromQuery] GetJobDetailsQueryObject job)
         {
-            if (!int.TryParse(User.FindFirst("Id").Value, out var userId))
+            if (!int.TryParse(User.GetUserIdClaim().Value, out var userId))
             {
                 return Unauthorized(new Error("Not logged in"));
             }
             try
             {
                 var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
-                var response = new GetJobDetailsResponseObject
+                var response = new JobResponseObject
                 {
                     Id = requiredJob.Id,
                     Name = requiredJob.Name,
                     Description = requiredJob.Description,
                     PostDate = requiredJob.PostDate,
                     Done = requiredJob.Done,
-                    Images = requiredJob.Images,
+                    Images = requiredJob.Images.Select(image => image.URL).ToArray(),
                 };
                 return Ok(response);
             }
