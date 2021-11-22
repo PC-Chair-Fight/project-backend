@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace project_backend.Models.DAOs
 {
-    [Table("workerApplications")]
+    [Table("worker_applications")]
     public class WorkerApplicationDAO
     {
         [Key]
