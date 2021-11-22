@@ -8,6 +8,7 @@ using project_backend.Models.AuthController.Register;
 using project_backend.Models.UserController.Login;
 using project_backend.Models.Utils;
 using project_backend.Providers.UserProvider;
+using project_backend.Providers.WorkerProvider;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,12 +23,13 @@ namespace project_backend.Controllers
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IUserProvider _userProvider;
-        //private readonly IWorkerProvider _userProvider;
+        private readonly IWorkerProvider _workerProvider;
 
-        public AuthController(ILogger<AuthController> logger, IUserProvider userProvider)
+        public AuthController(ILogger<AuthController> logger, IUserProvider userProvider, IWorkerProvider workerProvider)
         {
             _logger = logger;
             _userProvider = userProvider;
+            _workerProvider = workerProvider;
         }
 
         [HttpPost]
@@ -41,7 +43,8 @@ namespace project_backend.Controllers
 
             if (userId != -1)
             {
-                return Ok(new Token(GenerateToken(userId, UserRoles.User)));
+                var userIsWorker = _workerProvider.UserIsWorker(userId);
+                return Ok(new Token(GenerateToken(userId, userIsWorker ? UserRoles.Worker : UserRoles.User)));
             }
             return Unauthorized(new Error("Wrong credentials"));
         }

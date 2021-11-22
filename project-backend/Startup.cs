@@ -17,6 +17,7 @@ using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Providers.UserProvider;
 using project_backend.Providers.WorkerApplicationProvider;
+using project_backend.Providers.WorkerProvider;
 using project_backend.Repos;
 using System;
 using System.IO;
@@ -70,8 +71,7 @@ namespace project_backend
             services.AddTransient<IJobProvider, JobProvider>();
             services.AddTransient<IBidProvider, BidProvider>();
             services.AddTransient<IWorkerApplicationProvider, WorkerApplicationProvider>();
-
-
+            services.AddTransient<IWorkerProvider, WorkerProvider>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

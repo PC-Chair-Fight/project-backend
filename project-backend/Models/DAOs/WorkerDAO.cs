@@ -9,6 +9,8 @@ namespace project_backend.Models.Worker
     public class WorkerDAO
     {
         [Key]
+        [ForeignKey("users")]
+        [Required]
         public int UserId { get; set; }
         public UserDAO User { get; set; }
         public DateTime WorkerSince { get; set; } = DateTime.Now;
