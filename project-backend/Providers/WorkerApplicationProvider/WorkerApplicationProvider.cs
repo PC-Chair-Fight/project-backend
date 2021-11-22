@@ -54,16 +54,16 @@ namespace project_backend.Providers.WorkerApplicationProvider
 
             if (workerApplication != null)
             {
-                //var transaction = _dbContext.Database.BeginTransaction();
+                var transaction = _dbContext.Database.BeginTransaction();
 
                 _dbContext.WorkerApplications.Remove(workerApplication);
+                _dbContext.SaveChanges();
 
                 var newWorker = new WorkerDAO { UserId = userId };
                 _dbContext.Workers.Add(newWorker);
-
                 _dbContext.SaveChanges();
 
-                //transaction.Commit();
+                transaction.Commit();
             }
             else
             {
