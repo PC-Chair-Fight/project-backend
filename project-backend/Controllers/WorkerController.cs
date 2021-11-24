@@ -106,7 +106,7 @@ namespace project_backend.Controllers
         {
             try
             {
-                _workerApplicationProvider.AcceptWorkerApplication(userId);
+                _workerApplicationProvider.DeleteWorkerApplication(userId);
             }
             catch (ResourceNotFoundException ex)
             {
