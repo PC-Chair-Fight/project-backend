@@ -23,6 +23,7 @@ namespace project_backend.Test.ControllerTests
     public class JobControllerTest
     {
         private readonly JobController _controller;
+        private Mock<IJobProvider> _jobProvider;
 
         public JobControllerTest(ITestOutputHelper output)
         {
@@ -48,9 +49,9 @@ namespace project_backend.Test.ControllerTests
                 }
             };
 
-            var jobProviderMock = new Mock<IJobProvider>();
+            _jobProvider = new Mock<IJobProvider>();
 
-            jobProviderMock.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
+            _jobProvider.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
                 .Select(i =>
                     new JobDAO
                     {
@@ -78,7 +79,7 @@ namespace project_backend.Test.ControllerTests
                 })
                 .AsQueryable());
 
-            _controller = new JobController(NullLogger<JobController>.Instance, jobProviderMock.Object);
+            _controller = new JobController(NullLogger<JobController>.Instance, _jobProvider.Object);
 
             var contextMock = new Mock<HttpContext>();
             contextMock.Setup(x => x.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("Id", users[0].Id.ToString()) })));
@@ -207,6 +208,7 @@ namespace project_backend.Test.ControllerTests
 
         public void TestGetJobDetails_ValidJob()
         {
+            _jobProvider.Setup(x => x.GetJobById(1)).Returns(new JobDAO { Id = 1, Name = "Job2", Description = "Job2Desc", Images = new JobImageDAO[0] });
             var okResult = _controller.GetJobDetails(new GetJobDetailsQueryObject { Id = 1 }) as OkObjectResult;
             Assert.NotNull(okResult);
             Assert.Equal(200, okResult.StatusCode);

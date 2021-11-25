@@ -1,5 +1,7 @@
-﻿using project_backend.Models.Job;
+﻿using project_backend.Models.Exceptions;
+using project_backend.Models.Job;
 using project_backend.Repos;
+using System;
 using System.Linq;
 
 namespace project_backend.Providers.JobProvider
@@ -27,6 +29,20 @@ namespace project_backend.Providers.JobProvider
             _dbContext.SaveChanges();
 
             return newJob;
+        }
+
+        public JobDAO GetJobById(int jobId)
+        {
+            JobDAO requiredJob;
+            try
+            {
+                requiredJob = _dbContext.Jobs.AsQueryable().Where(job => job.Id == jobId).First();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new ResourceNotFoundException("Job with that id doesn't exist!");
+            }
+            return requiredJob;
         }
     }
 }

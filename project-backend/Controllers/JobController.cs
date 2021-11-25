@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
+using project_backend.Models.Exceptions;
 using project_backend.Models.Job;
 using project_backend.Models.JobController;
 using project_backend.Models.JobController.AddJob;
@@ -11,7 +12,6 @@ using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
-using System;
 using System.Linq;
 
 namespace project_backend.Controllers
@@ -110,7 +110,8 @@ namespace project_backend.Controllers
             }
             try
             {
-                var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
+                //var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
+                var requiredJob = _jobProvider.GetJobById(job.Id);
                 var response = new JobResponseObject
                 {
                     Id = requiredJob.Id,
@@ -122,9 +123,9 @@ namespace project_backend.Controllers
                 };
                 return Ok(response);
             }
-            catch (InvalidOperationException)
+            catch (ResourceNotFoundException exception)
             {
-                return NotFound(new Error("Job with that id doesn't exist!"));
+                return NotFound(new Error(exception.Message));
             }
 
         }
