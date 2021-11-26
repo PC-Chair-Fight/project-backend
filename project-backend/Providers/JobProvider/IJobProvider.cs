@@ -8,5 +8,7 @@ namespace project_backend.Providers.JobProvider
         public IQueryable<JobDAO> QueryJobs();
         public JobDAO AddJob(string name, string description, int authorId);
 
+        public JobDAO GetJobById(int jobId);
+
     }
 }

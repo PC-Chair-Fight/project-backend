@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
+using project_backend.Models.Exceptions;
 using project_backend.Models.Job;
-using project_backend.Models.JobController.GetJobs;
+using project_backend.Models.JobController;
 using project_backend.Models.JobController.AddJob;
+using project_backend.Models.JobController.GetJobDetails;
+using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
@@ -72,15 +75,15 @@ namespace project_backend.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("add")]
-        public AddJobResponseObject AddJob([FromBody] AddJobQueryObject job)
+        [Route("Add")]
+        public JobResponseObject AddJob([FromBody] AddJobQueryObject job)
         {
 
             var userIdClaim = HttpContext.User.GetUserIdClaim();
 
             var newJob = _jobProvider.AddJob(job.Name, job.Description, int.Parse(userIdClaim.Value));
 
-            var response = new AddJobResponseObject
+            var response = new JobResponseObject
             {
                 UserId = newJob.UserId,
                 PostDate = newJob.PostDate,
@@ -90,6 +93,40 @@ namespace project_backend.Controllers
                 Name = newJob.Name,
             };
             return response;
+        }
+
+        [HttpGet]
+        [Route("Details")]
+        [ProducesResponseType(typeof(JobResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+        public IActionResult GetJobDetails([FromQuery] GetJobDetailsQueryObject job)
+        {
+            if (!int.TryParse(User.GetUserIdClaim().Value, out var userId))
+            {
+                return Unauthorized(new Error("Not logged in"));
+            }
+            try
+            {
+                //var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
+                var requiredJob = _jobProvider.GetJobById(job.Id);
+                var response = new JobResponseObject
+                {
+                    Id = requiredJob.Id,
+                    Name = requiredJob.Name,
+                    Description = requiredJob.Description,
+                    PostDate = requiredJob.PostDate,
+                    Done = requiredJob.Done,
+                    Images = requiredJob.Images.Select(image => image.URL).ToArray(),
+                };
+                return Ok(response);
+            }
+            catch (ResourceNotFoundException exception)
+            {
+                return NotFound(new Error(exception.Message));
+            }
+
         }
     }
 

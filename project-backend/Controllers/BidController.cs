@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using project_backend.Models;
+using project_backend.Models.Bid;
 using project_backend.Models.BidController.AddBid;
-using project_backend.Models.JobController.AddJob;
-using project_backend.Providers.BidProvider;
-using System.Linq;
-using project_backend.Models.Utils;
-using Microsoft.AspNetCore.Http;
 using project_backend.Models.BidController.EditBid;
 using project_backend.Models.Exceptions;
-using project_backend.Models.Bid;
-using project_backend.Models;
+using project_backend.Models.Utils;
+using project_backend.Providers.BidProvider;
 
 namespace project_backend.Controllers
 {

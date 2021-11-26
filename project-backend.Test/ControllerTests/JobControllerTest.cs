@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using project_backend.Controllers;
+using project_backend.Models.Bid;
 using project_backend.Models.Job;
+using project_backend.Models.JobController;
+using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
+using project_backend.Models.JobImage;
 using project_backend.Models.User;
 using project_backend.Providers.JobProvider;
 using System;
@@ -19,6 +23,7 @@ namespace project_backend.Test.ControllerTests
     public class JobControllerTest
     {
         private readonly JobController _controller;
+        private Mock<IJobProvider> _jobProvider;
 
         public JobControllerTest(ITestOutputHelper output)
         {
@@ -44,18 +49,21 @@ namespace project_backend.Test.ControllerTests
                 }
             };
 
-            var jobProviderMock = new Mock<IJobProvider>();
+            _jobProvider = new Mock<IJobProvider>();
 
-            jobProviderMock.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
+            _jobProvider.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
                 .Select(i =>
                     new JobDAO
                     {
+                        Id = i,
                         Name = $"Job{i + 1}",
                         Description = $"Job{i + 1}Desc",
                         User = users[i % 2],
                         UserId = users[i % 2].Id,
                         PostDate = i % 2 == 0 ? new DateTime(2020, 3, 20 + i / 2) : new DateTime(2021, 2, 1 + i / 2),
                         Done = i % 2 != 0,
+                        Images = new JobImageDAO[0],
+                        Bids = new BidDAO[0]
                     }
                 )
                 .Append(new JobDAO
@@ -66,10 +74,12 @@ namespace project_backend.Test.ControllerTests
                     UserId = users[0].Id,
                     PostDate = new DateTime(2020, 3, 21),
                     Done = false,
+                    Images = new JobImageDAO[0],
+                    Bids = new BidDAO[0]
                 })
                 .AsQueryable());
 
-            _controller = new JobController(NullLogger<JobController>.Instance, jobProviderMock.Object);
+            _controller = new JobController(NullLogger<JobController>.Instance, _jobProvider.Object);
 
             var contextMock = new Mock<HttpContext>();
             contextMock.Setup(x => x.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("Id", users[0].Id.ToString()) })));
@@ -192,6 +202,24 @@ namespace project_backend.Test.ControllerTests
 
             Assert.Equal(new DateTime(2020, 3, 22), resultObject.jobs[4].PostDate);
             Assert.Equal(new DateTime(2020, 3, 21), resultObject.jobs[5].PostDate);
+        }
+
+        [Fact]
+
+        public void TestGetJobDetails_ValidJob()
+        {
+            _jobProvider.Setup(x => x.GetJobById(1)).Returns(new JobDAO { Id = 1, Name = "Job2", Description = "Job2Desc", Images = new JobImageDAO[0] });
+            var okResult = _controller.GetJobDetails(new GetJobDetailsQueryObject { Id = 1 }) as OkObjectResult;
+            Assert.NotNull(okResult);
+            Assert.Equal(200, okResult.StatusCode);
+
+            var resultObject = okResult.Value as JobResponseObject;
+            Assert.NotNull(resultObject);
+
+            Assert.Equal("Job2", resultObject.Name);
+            Assert.Equal("Job2Desc", resultObject.Description);
+
+
         }
     }
 }

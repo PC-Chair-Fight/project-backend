@@ -1,5 +1,8 @@
+using project_backend.Models.Bid;
+using project_backend.Models.JobImage;
 using project_backend.Models.User;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,5 +21,9 @@ namespace project_backend.Models.Job
         [Required]
         public int UserId { get; set; }
         public UserDAO User { get; set; }
+
+        public ICollection<JobImageDAO> Images { get; set; }
+
+        public ICollection<BidDAO> Bids { get; set; }
     }
 }
