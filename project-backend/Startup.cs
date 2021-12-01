@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using project_backend.Models.Validators.BidController.AddBid;
 using project_backend.Models.Validators.BidController.EditJob;
 using project_backend.Models.Validators.JobController.AddJob;
+using project_backend.Models.Validators.JobController.GetJobBids;
 using project_backend.Models.Validators.JobController.GetJobs;
 using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
@@ -49,7 +50,8 @@ namespace project_backend
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>())
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<EditBidQueryValidator>())
-                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>());
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobBidsQueryValidator>());
 
 
             if (this.WebHostEnvironment.IsProduction())

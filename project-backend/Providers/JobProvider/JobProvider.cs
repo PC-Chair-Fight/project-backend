@@ -48,10 +48,9 @@ namespace project_backend.Providers.JobProvider
         }
 
 
-        public IQueryable<BidDAO> GetJobBids(int jobId)
+        public IQueryable<BidDAO> QueryJobBids(int jobId)
         {
-            var bids = _dbContext.Bids.Where(b => b.JobId == jobId);
-            return bids;
+            return _dbContext.Bids.Where(b => b.JobId == jobId).OrderBy(bid => bid.Sum).AsQueryable();
         }
 
     }
