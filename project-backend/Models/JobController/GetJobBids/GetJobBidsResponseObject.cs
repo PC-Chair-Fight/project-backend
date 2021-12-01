@@ -7,7 +7,7 @@ namespace project_backend.Models.JobController.GetJobBids
     public class GetJobBidsResponseObject
     {
         public List<JobBidDTO> Bids { get; set; }
-        public GetJobBidsResponseObject(IQueryable<BidDAO> bidsInput)
+        public GetJobBidsResponseObject(IList<BidDAO> bidsInput)
         {
             Bids = bidsInput.Select(b => new JobBidDTO
             {

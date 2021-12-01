@@ -139,7 +139,7 @@ namespace project_backend.Controllers
 
             var bids = _jobProvider.QueryJobBids(jobId)
                 .Skip(index)
-                .Take(count);
+                .Take(count).ToList();
 
             return Ok(new GetJobBidsResponseObject(bids));
         }
