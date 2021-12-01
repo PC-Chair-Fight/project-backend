@@ -40,7 +40,7 @@ namespace project_backend.Providers.JobProvider
                 JobDAO requiredJob = _dbContext.Jobs.Include(job => job.Images).Where(job => job.Id == jobId).First();
                 return requiredJob;
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 throw new ResourceNotFoundException("Job with that id doesn't exist!");
             }
