@@ -56,5 +56,10 @@ namespace project_backend.Providers.BidProvider
             return editedBid;
 
         }
+
+        public IQueryable<BidDAO> QueryJobBids(int jobId)
+        {
+            return _dbContext.Bids.Where(b => b.JobId == jobId).OrderBy(bid => bid.Sum).AsQueryable();
+        }
     }
 }

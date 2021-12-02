@@ -11,6 +11,7 @@ using project_backend.Models.JobController.GetJobBids;
 using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
+using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
 using System.Collections.Generic;
@@ -24,11 +25,14 @@ namespace project_backend.Controllers
     {
         private readonly ILogger<JobController> _logger;
         private readonly IJobProvider _jobProvider;
+        private readonly IBidProvider _bidProvider;
 
-        public JobController(ILogger<JobController> logger, IJobProvider jobProvider)
+
+        public JobController(ILogger<JobController> logger, IJobProvider jobProvider, IBidProvider bidProvider)
         {
             _logger = logger;
             _jobProvider = jobProvider;
+            _bidProvider = bidProvider;
         }
 
         [HttpPost]
@@ -137,7 +141,7 @@ namespace project_backend.Controllers
             var jobId = query.JobId ?? 0;
             var count = query.Count ?? 10;
 
-            var bids = _jobProvider.QueryJobBids(jobId)
+            var bids = _bidProvider.QueryJobBids(jobId)
                 .Skip(index)
                 .Take(count).ToList();
 
