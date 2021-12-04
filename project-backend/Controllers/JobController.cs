@@ -53,8 +53,8 @@ namespace project_backend.Controllers
                     q => q.Where(j => j.PostDate >= query.NewerThan))
                 .Filter(query.FilterFields, query.FilterValues, query.ExactFilters)
                 .Sort(query.OrderBy, query.Ascending)
-                .Skip(query.Index)
-                .Take(query.Count)
+                .Skip((int)query.Index)
+                .Take((int)query.Count)
                 .Select(j => new GetJobsResponseObject.GetJobsResponseEntry
                 {
                     Id = j.Id,
@@ -62,7 +62,23 @@ namespace project_backend.Controllers
                     Description = j.Description,
                     Done = j.Done,
                     PostDate = j.PostDate,
-                    UserId = j.UserId
+                    User = new GetJobsResponseObject.FetchedUser
+                    {
+                        ProfileImage = j.User.ProfileImage,
+                        FirstName = j.User.FirstName,
+                        LastName = j.User.LastName
+                    },
+                    Bids = j.Bids.Take(3).Select(bid => new GetJobsResponseObject.FetchedBid
+                    {
+                        Sum = bid.Sum,
+                        Worker = new GetJobsResponseObject.FetchedUser
+                        {
+                            ProfileImage = bid.Worker.User.ProfileImage,
+                            FirstName = bid.Worker.User.FirstName,
+                            LastName = bid.Worker.User.LastName
+                        }
+                    }).ToArray()
+
                 }).ToArray();
 
             _logger.LogInformation("GetJobs -> {0}", returnValue);

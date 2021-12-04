@@ -25,7 +25,9 @@ namespace project_backend.Models.Validators.JobController.GetJobs
             // similar checks for OrderBy and Ascending
             RuleFor(x => x.OrderBy).NotEmpty().Unless(x => x.Ascending == null).WithMessage(orderByErrorMessage);
             RuleFor(x => x.Ascending).NotEmpty().Unless(x => x.OrderBy == null).WithMessage(orderByErrorMessage);
-            RuleFor(x => x.OrderBy.Length).Equal(x => x.Ascending.Length).WithMessage(orderByErrorMessage);
+            RuleFor(x => x.OrderBy.Length).Equal(x => x.Ascending.Length)
+                .Unless(x => x.OrderBy == null || x.Ascending == null)
+                .WithMessage(orderByErrorMessage);
 
             RuleForEach(x => x.FilterValues.Zip(x.FilterFields))
                 .Must(x =>
@@ -34,19 +36,23 @@ namespace project_backend.Models.Validators.JobController.GetJobs
                     var value = x.First;
                     return field switch
                     {
-                    // must be able to parse int
-                    GetJobsQueryObject.FilterField.Id => int.TryParse(value, out int dummyInt),
-                    // must be able to parse bool
-                    GetJobsQueryObject.FilterField.Done => bool.TryParse(value, out bool dummyBool),
-                    _ => true
+                        // must be able to parse int
+                        GetJobsQueryObject.FilterField.Id => int.TryParse(value, out int dummyInt),
+                        // must be able to parse bool
+                        GetJobsQueryObject.FilterField.Done => bool.TryParse(value, out bool dummyBool),
+                        _ => true
                     };
                 })
-                .WithMessage("Filter values must be string representations of values of their respective types");
+                .WithMessage("Filter values must be string representations of values of their respective types")
+                .Unless(x => x.FilterFields == null || x.FilterValues == null)
+                .OverridePropertyName("FilterValues")
+                .OverridePropertyName("FilterFields");
 
             RuleFor(x => x.OlderThan).GreaterThanOrEqualTo(x => x.NewerThan).When(x => x.OlderThan != null && x.NewerThan != null);
 
             RuleFor(x => x.FilterFields)
                 .Must(x => x.Distinct().Count() == x.Length)
+                .Unless(x => x.FilterFields == null)
                 .WithMessage("FilterFields must be unique");
 
             RuleFor(x => x.Index).NotEmpty().GreaterThanOrEqualTo(0);

@@ -14,8 +14,8 @@ namespace project_backend.Models.JobController.GetJobs
         public string[] FilterValues { get; set; }
         public bool[] ExactFilters { get; set; }
 
-        public int Index { get; set; }
-        public int Count { get; set; }
+        public int? Index { get; set; }
+        public int? Count { get; set; }
 
         public DateTime? OlderThan { get; set; }
         public DateTime? NewerThan { get; set; }
