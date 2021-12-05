@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using project_backend.Models.Bid;
 using project_backend.Models.Job;
 using project_backend.Repos;
@@ -10,14 +12,21 @@ namespace project_backend.Controllers
     public class TestController : ControllerBase
     {
         private DatabaseContext _ctx;
-        public TestController(DatabaseContext ctx)
+        private IWebHostEnvironment _env;
+        public TestController(IWebHostEnvironment env, DatabaseContext ctx)
         {
             _ctx = ctx;
+            _env = env;
         }
 
         [HttpPost]
         public void CreateMockData()
         {
+            if (!_env.IsDevelopment())
+            {
+                return;
+            }
+
             var workerUser = new Models.User.UserDAO
             {
                 FirstName = "test1",
