@@ -130,11 +130,11 @@ namespace project_backend.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Authorize]
         [Route("Bids")]
         [ProducesResponseType(typeof(GetJobBidsResponseObject), StatusCodes.Status200OK)]
-        public IActionResult GetJobBids([FromBody] GetJobBidsQueryObject query)
+        public IActionResult GetJobBids([FromQuery] GetJobBidsQueryObject query)
         {
             //While we used null-coalescing here, they would never be null because of the validator.
             var index = query.Index ?? 0;
