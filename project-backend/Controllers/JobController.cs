@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
 using project_backend.Models.Exceptions;
@@ -43,8 +44,12 @@ namespace project_backend.Controllers
                 return Unauthorized(new Error("Not logged in"));
             }
 
+            var test = _jobProvider.QueryJobs().ToArray();
+
             var returnValue = _jobProvider
                 .QueryJobs()
+                .Include(j => j.Bids)
+                    .ThenInclude(b => b.Worker).ThenInclude(w => w.User)
                 .If(query.ByCurrentUserOnly ?? false,
                     q => q.Where(j => j.UserId == userId))
                 .If(query.OlderThan != null,
@@ -71,11 +76,14 @@ namespace project_backend.Controllers
                     Bids = j.Bids.Take(3).Select(bid => new GetJobsResponseObject.FetchedBid
                     {
                         Sum = bid.Sum,
-                        Worker = new GetJobsResponseObject.FetchedUser
+                        Worker = new GetJobsResponseObject.FetchedWorker
                         {
-                            ProfileImage = bid.Worker.User.ProfileImage,
-                            FirstName = bid.Worker.User.FirstName,
-                            LastName = bid.Worker.User.LastName
+                            User = new GetJobsResponseObject.FetchedUser
+                            {
+                                ProfileImage = bid.Worker.User.ProfileImage,
+                                FirstName = bid.Worker.User.FirstName,
+                                LastName = bid.Worker.User.LastName
+                            }
                         }
                     }).ToArray()
 

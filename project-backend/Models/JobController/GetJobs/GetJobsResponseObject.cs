@@ -12,10 +12,15 @@ namespace project_backend.Models.JobController.GetJobs
             public string ProfileImage { get; set; }
         }
 
+        public class FetchedWorker
+        {
+            public FetchedUser User { get; set; }
+        }
+
         public class FetchedBid
         {
-            public FetchedUser Worker { get; set; }
-            public float Sum;
+            public FetchedWorker Worker { get; set; }
+            public float Sum { get; set; }
         }
 
         public class GetJobsResponseEntry
