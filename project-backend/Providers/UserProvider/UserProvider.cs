@@ -1,4 +1,5 @@
-﻿using project_backend.Models.User;
+﻿using project_backend.Models.Exceptions;
+using project_backend.Models.User;
 using project_backend.Repos;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,16 @@ namespace project_backend.Providers.UserProvider
             _dbContext.Users.Add(userDAO);
             _dbContext.SaveChanges();
             return userDAO.Id;
+        }
+
+        public UserDAO GetUserById(int userId)
+        {
+            var user = _dbContext.Users.Find(userId);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("User could not be found");
+            }
+            return user;
         }
 
         public int getUserIdByCredentials(string email, string password)
