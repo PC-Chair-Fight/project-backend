@@ -3,6 +3,7 @@ using project_backend.Models.Exceptions;
 using project_backend.Models.Worker;
 using project_backend.Repos;
 using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 namespace project_backend.Providers.BidProvider
 {
@@ -59,7 +60,9 @@ namespace project_backend.Providers.BidProvider
 
         public IQueryable<BidDAO> QueryJobBids(int jobId)
         {
-            return _dbContext.Bids.Where(b => b.JobId == jobId).OrderBy(bid => bid.Sum).AsQueryable();
+            return _dbContext.Bids.Include(bid => bid.Worker).ThenInclude(worker => worker.User).Where(b => b.JobId == jobId).OrderBy(bid => bid.Sum).AsQueryable();
+
+            //return _dbContext.Bids.Include(bid => bid.Worker).Join(_dbContext.Users,bid => bid.WorkerId, user => user.Id,res => res.).Where(b => b.JobId == jobId).OrderBy(bid => bid.Sum).AsQueryable();
         }
     }
 }

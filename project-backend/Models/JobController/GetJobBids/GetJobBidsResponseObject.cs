@@ -1,4 +1,5 @@
 ﻿using project_backend.Models.Bid;
+using project_backend.Models.User;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +15,7 @@ namespace project_backend.Models.JobController.GetJobBids
                 Id = b.Id,
                 JobId = b.JobId,
                 Sum = b.Sum,
-                WorkerId = b.WorkerId
+                Worker = new WorkerDTO(b.Worker.User)
             }
             ).ToList();
         }
@@ -24,7 +25,21 @@ namespace project_backend.Models.JobController.GetJobBids
     {
         public int Id { get; set; }
         public float Sum { get; set; }
-        public int WorkerId { get; set; }
+        public WorkerDTO Worker { get; set; }
         public int JobId { get; set; }
     }
+
+    public class WorkerDTO
+    {
+        public WorkerDTO(UserDAO user)
+        {
+            Id = user.Id;
+            FirstName = user.FirstName;
+            LastName = user.LastName;
+        }
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
 }
