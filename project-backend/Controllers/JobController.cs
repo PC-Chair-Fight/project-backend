@@ -134,6 +134,7 @@ namespace project_backend.Controllers
         [Authorize]
         [Route("Bids")]
         [ProducesResponseType(typeof(GetJobBidsResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public IActionResult GetJobBids([FromQuery] GetJobBidsQueryObject query)
         {
             //While we used null-coalescing here, they would never be null because of the validator.

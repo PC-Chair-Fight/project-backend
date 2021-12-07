@@ -50,8 +50,7 @@ namespace project_backend
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>())
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<EditBidQueryValidator>())
-                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>())
-                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobBidsQueryValidator>());
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>());
 
 
             if (this.WebHostEnvironment.IsProduction())
