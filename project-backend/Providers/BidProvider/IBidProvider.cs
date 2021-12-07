@@ -7,5 +7,7 @@ namespace project_backend.Providers.BidProvider
     {
         public BidDAO AddBid(float sum, int workerId, int jobId);
         public BidDAO EditBid(float sum, int workerId, int bidId);
+        public IQueryable<BidDAO> QueryJobBids(int jobId);
+
     }
 }

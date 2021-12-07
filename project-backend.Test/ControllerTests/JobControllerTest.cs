@@ -10,6 +10,7 @@ using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.JobImage;
 using project_backend.Models.User;
+using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using System;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace project_backend.Test.ControllerTests
     {
         private readonly JobController _controller;
         private Mock<IJobProvider> _jobProvider;
+        private Mock<IBidProvider> _bidProvider;
 
         public JobControllerTest(ITestOutputHelper output)
         {
@@ -50,6 +52,8 @@ namespace project_backend.Test.ControllerTests
             };
 
             _jobProvider = new Mock<IJobProvider>();
+
+            _bidProvider = new Mock<IBidProvider>();
 
             _jobProvider.Setup(x => x.QueryJobs()).Returns(Enumerable.Range(0, 5)
                 .Select(i =>
@@ -79,7 +83,7 @@ namespace project_backend.Test.ControllerTests
                 })
                 .AsQueryable());
 
-            _controller = new JobController(NullLogger<JobController>.Instance, _jobProvider.Object);
+            _controller = new JobController(NullLogger<JobController>.Instance, _jobProvider.Object, _bidProvider.Object);
 
             var contextMock = new Mock<HttpContext>();
             contextMock.Setup(x => x.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("Id", users[0].Id.ToString()) })));

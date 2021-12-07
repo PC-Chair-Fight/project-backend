@@ -7,11 +7,14 @@ using project_backend.Models.Exceptions;
 using project_backend.Models.Job;
 using project_backend.Models.JobController;
 using project_backend.Models.JobController.AddJob;
+using project_backend.Models.JobController.GetJobBids;
 using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
 using project_backend.Models.Utils;
+using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace project_backend.Controllers
@@ -22,11 +25,14 @@ namespace project_backend.Controllers
     {
         private readonly ILogger<JobController> _logger;
         private readonly IJobProvider _jobProvider;
+        private readonly IBidProvider _bidProvider;
 
-        public JobController(ILogger<JobController> logger, IJobProvider jobProvider)
+
+        public JobController(ILogger<JobController> logger, IJobProvider jobProvider, IBidProvider bidProvider)
         {
             _logger = logger;
             _jobProvider = jobProvider;
+            _bidProvider = bidProvider;
         }
 
         [HttpPost]
@@ -96,20 +102,15 @@ namespace project_backend.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("Details")]
         [ProducesResponseType(typeof(JobResponseObject), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
         public IActionResult GetJobDetails([FromQuery] GetJobDetailsQueryObject job)
         {
-            if (!int.TryParse(User.GetUserIdClaim().Value, out var userId))
-            {
-                return Unauthorized(new Error("Not logged in"));
-            }
             try
             {
-                //var requiredJob = _jobProvider.QueryJobs().Where(j => j.Id == job.Id).First();
                 var requiredJob = _jobProvider.GetJobById(job.Id);
                 var response = new JobResponseObject
                 {
@@ -127,6 +128,25 @@ namespace project_backend.Controllers
                 return NotFound(new Error(exception.Message));
             }
 
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("Bids")]
+        [ProducesResponseType(typeof(GetJobBidsResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        public IActionResult GetJobBids([FromQuery] GetJobBidsQueryObject query)
+        {
+            //While we used null-coalescing here, they would never be null because of the validator.
+            var index = query.Index ?? 0;
+            var jobId = query.JobId ?? 0;
+            var count = query.Count ?? 10;
+
+            var bids = _bidProvider.QueryJobBids(jobId)
+                .Skip(index)
+                .Take(count).ToList();
+
+            return Ok(new GetJobBidsResponseObject(bids));
         }
     }
 
