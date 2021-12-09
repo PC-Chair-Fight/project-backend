@@ -44,8 +44,6 @@ namespace project_backend.Controllers
                 return Unauthorized(new Error("Not logged in"));
             }
 
-            var test = _jobProvider.QueryJobs().ToArray();
-
             var returnValue = _jobProvider
                 .QueryJobs()
                 .Include(j => j.Bids)
