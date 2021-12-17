@@ -7,7 +7,8 @@ namespace project_backend.Providers.JobProvider
     public interface IJobProvider
     {
         public IQueryable<JobDAO> QueryJobs();
-        public JobDAO AddJob(string name, string description, int authorId);
+        public JobDAO AddJob(string name, string description, int authorId, byte[][] images);
+
         public JobDAO GetJobById(int jobId);
     }
 }

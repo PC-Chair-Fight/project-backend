@@ -28,7 +28,7 @@
   <ItemGroup>
     <Folder Include="Attributes\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\Images\Jobs\" />
   </ItemGroup>
 
   <ItemGroup>

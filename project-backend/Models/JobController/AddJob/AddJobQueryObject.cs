@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace project_backend.Models.JobController.AddJob
 {
@@ -6,5 +6,6 @@ namespace project_backend.Models.JobController.AddJob
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public IFormFileCollection Images { get; set; }
     }
 }
