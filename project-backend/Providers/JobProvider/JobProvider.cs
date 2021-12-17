@@ -1,6 +1,4 @@
-
-using project_backend.Models.Bid;
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using project_backend.Models.Exceptions;
 using project_backend.Models.Job;
 using project_backend.Models.JobImage;
@@ -9,7 +7,6 @@ using System;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 
 namespace project_backend.Providers.JobProvider
