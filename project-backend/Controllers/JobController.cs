@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using project_backend.Models;
 using project_backend.Models.Exceptions;
+using project_backend.Models.Exceptions.Universal;
 using project_backend.Models.Job;
 using project_backend.Models.JobController;
 using project_backend.Models.JobController.AddJob;
+using project_backend.Models.JobController.EditJob;
 using project_backend.Models.JobController.GetJobBids;
 using project_backend.Models.JobController.GetJobDetails;
 using project_backend.Models.JobController.GetJobs;
@@ -121,6 +123,40 @@ namespace project_backend.Controllers
                 Name = newJob.Name,
             };
             return response;
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("Edit")]
+        [ProducesResponseType(typeof(JobResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+        public IActionResult EditJob([FromBody] EditJobQueryObject editedJob)
+        {
+            var userIdClaim = HttpContext.User.GetUserIdClaim();
+            try
+            {
+                var updatedJob = _jobProvider.EditJob(editedJob.Id, editedJob.Name, editedJob.Description, int.Parse(userIdClaim.Value));
+                var response = new JobResponseObject
+                {
+                    UserId = updatedJob.UserId,
+                    PostDate = updatedJob.PostDate,
+                    Description = updatedJob.Description,
+                    Done = updatedJob.Done,
+                    Id = updatedJob.Id,
+                    Name = updatedJob.Name,
+                };
+                return Ok(response);
+            }
+            catch (ResourceNotFoundException exception)
+            {
+                return NotFound(new Error(exception.Message));
+            }
+            catch (UnauthorizedException)
+            {
+                return Forbid();
+            }
         }
 
         [HttpGet]

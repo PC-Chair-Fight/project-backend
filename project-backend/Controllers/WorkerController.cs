@@ -28,7 +28,7 @@ namespace project_backend.Controllers
         [Route("Apply")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult ApplyForWorker()
         {
             var userIdClaim = HttpContext.User.GetUserIdClaim();
@@ -40,9 +40,9 @@ namespace project_backend.Controllers
             {
                 return Conflict(new Error(ex.Message));
             }
-            catch (UserIsAlreadyWorker ex)
+            catch (UserIsAlreadyWorker)
             {
-                return Forbid(ex.Message);
+                return Forbid();
             }
 
             return Ok();

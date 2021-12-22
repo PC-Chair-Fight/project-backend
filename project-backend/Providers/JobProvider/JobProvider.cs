@@ -5,6 +5,7 @@ using project_backend.Repos;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System;
+using project_backend.Models.Exceptions.Universal;
 
 namespace project_backend.Providers.JobProvider
 {
@@ -31,6 +32,25 @@ namespace project_backend.Providers.JobProvider
             _dbContext.SaveChanges();
 
             return newJob;
+        }
+
+        public JobDAO EditJob(int id, string newName, string newDescription, int userId)
+        {
+            JobDAO correspondingJob = _dbContext.Jobs.Find(id);
+
+            if (correspondingJob == null)
+                throw new ResourceNotFoundException("Job not found");
+
+            if (correspondingJob.UserId != userId)
+                throw new UnauthorizedException("User isn't the author of the job");
+
+            correspondingJob.Name = newName;
+            correspondingJob.Description = newDescription;
+
+            JobDAO updatedJob = _dbContext.Jobs.Update(correspondingJob).Entity;
+            _dbContext.SaveChanges();
+
+            return updatedJob;
         }
 
         public JobDAO GetJobById(int jobId)
