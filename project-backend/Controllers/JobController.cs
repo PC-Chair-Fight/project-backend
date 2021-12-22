@@ -131,7 +131,6 @@ namespace project_backend.Controllers
         [ProducesResponseType(typeof(JobResponseObject), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-
         public IActionResult EditJob([FromBody] EditJobQueryObject editedJob)
         {
             var userIdClaim = HttpContext.User.GetUserIdClaim();
