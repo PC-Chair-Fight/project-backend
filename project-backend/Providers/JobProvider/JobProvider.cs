@@ -36,7 +36,10 @@ namespace project_backend.Providers.JobProvider
 
         public JobDAO EditJob(int id, string newName, string newDescription, int userId)
         {
-            JobDAO correspondingJob = _dbContext.Jobs.Find(id);
+            JobDAO correspondingJob = _dbContext.Jobs
+                            .Include(job => job.Images)
+                            .Where(job => job.Id == id)
+                            .FirstOrDefault();
 
             if (correspondingJob == null)
                 throw new ResourceNotFoundException("Job not found");
@@ -47,10 +50,9 @@ namespace project_backend.Providers.JobProvider
             correspondingJob.Name = newName;
             correspondingJob.Description = newDescription;
 
-            JobDAO updatedJob = _dbContext.Jobs.Update(correspondingJob).Entity;
             _dbContext.SaveChanges();
 
-            return updatedJob;
+            return correspondingJob;
         }
 
         public JobDAO GetJobById(int jobId)

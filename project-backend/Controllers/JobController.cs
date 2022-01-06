@@ -145,6 +145,7 @@ namespace project_backend.Controllers
                     Done = updatedJob.Done,
                     Id = updatedJob.Id,
                     Name = updatedJob.Name,
+                    Images = updatedJob.Images.Select(image => image.URL).ToArray(),
                 };
                 return Ok(response);
             }
