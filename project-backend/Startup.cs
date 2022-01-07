@@ -1,3 +1,5 @@
+using FluentValidation.AspNetCore;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,19 +9,34 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using project_backend.Models.Validators.BidController.AddBid;
+using project_backend.Models.Validators.BidController.EditJob;
+using project_backend.Models.Validators.JobController.AddJob;
+using project_backend.Models.Validators.JobController.GetJobBids;
+using project_backend.Models.Validators.JobController.GetJobs;
+using project_backend.Providers.BidProvider;
+using project_backend.Providers.JobProvider;
+using project_backend.Providers.UserProvider;
+using project_backend.Providers.WorkerApplicationProvider;
+using project_backend.Providers.WorkerProvider;
 using project_backend.Repos;
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace project_backend
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+
+        IWebHostEnvironment WebHostEnvironment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            WebHostEnvironment = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -28,12 +45,34 @@ namespace project_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<GetJobsQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddJobQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<EditBidQueryValidator>())
+                .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<AddBidQueryValidator>());
 
-            services.AddDbContext<DatabaseContext>(options =>
+
+            if (this.WebHostEnvironment.IsProduction())
             {
-                options.UseInMemoryDatabase("InMemoryDb");
-            });
+                services.AddDbContext<DatabaseContext>(options =>
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("ProductionDbConnection"));
+                });
+            }
+            else
+            {
+                services.AddDbContext<DatabaseContext>(options =>
+                {
+                    options.UseInMemoryDatabase("InMemoryDb");
+                });
+            }
+
+            services.AddTransient<IUserProvider, UserProvider>();
+            services.AddTransient<IJobProvider, JobProvider>();
+            services.AddTransient<IBidProvider, BidProvider>();
+            services.AddTransient<IWorkerApplicationProvider, WorkerApplicationProvider>();
+            services.AddTransient<IWorkerProvider, WorkerProvider>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -49,10 +88,10 @@ namespace project_backend
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "project_backend", Version = "v1" });
-
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",
@@ -69,10 +108,11 @@ namespace project_backend
                 };
                 c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {securityScheme, new string[] { }}
-    });
+                    {
+                        {securityScheme, Array.Empty<string>()}
+                    });
             });
+            services.AddFluentValidationRulesToSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

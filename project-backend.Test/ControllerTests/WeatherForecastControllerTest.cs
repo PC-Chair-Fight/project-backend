@@ -1,4 +1,5 @@
-﻿using project_backend.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using project_backend.Controllers;
 using project_backend.Models;
 using System;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace project_backend.Test
             Token result;
 
             // Act
-            result = _controller.Get();
+            result = (_controller.Get() as ObjectResult).Value as Token;
 
             // Assert
             Assert.True(result.token.Length > 0);
