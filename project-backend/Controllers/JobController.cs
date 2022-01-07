@@ -18,6 +18,7 @@ using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
 using project_backend.Utils;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace project_backend.Controllers
@@ -106,12 +107,27 @@ namespace project_backend.Controllers
         [HttpPost]
         [Authorize]
         [Route("Add")]
-        public JobResponseObject AddJob([FromBody] AddJobQueryObject job)
+        public JobResponseObject AddJob([FromForm] AddJobQueryObject job)
         {
-
             var userIdClaim = HttpContext.User.GetUserIdClaim();
+            var imagesBytes = job.Images != null
+                ? job.Images
+                    .Select(file =>
+                    {
+                        using (var stream = new MemoryStream())
+                        {
+                            file.CopyTo(stream);
+                            return stream.ToArray();
+                        }
+                    }).ToArray()
+                : null;
 
-            var newJob = _jobProvider.AddJob(job.Name, job.Description, int.Parse(userIdClaim.Value));
+            var newJob = _jobProvider.AddJob(
+                job.Name,
+                job.Description,
+                int.Parse(userIdClaim.Value),
+                imagesBytes
+            );
 
             var response = new JobResponseObject
             {
@@ -177,7 +193,9 @@ namespace project_backend.Controllers
                     Description = requiredJob.Description,
                     PostDate = requiredJob.PostDate,
                     Done = requiredJob.Done,
-                    Images = requiredJob.Images.Select(image => image.URL).ToArray(),
+                    Images = requiredJob.Images
+                        .Select(image => $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}/{image.URL}")
+                        .ToArray(),
                 };
                 return Ok(response);
             }

@@ -8,9 +8,9 @@ namespace project_backend.Models.DAOs
     public class WorkerApplicationDAO
     {
         [Key]
-        [ForeignKey("users")]
         [Required]
         public int UserId { get; set; }
+        [ForeignKey("UserId")]
         public UserDAO User { get; set; }
     }
 }
