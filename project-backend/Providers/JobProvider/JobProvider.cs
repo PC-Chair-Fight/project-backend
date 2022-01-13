@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using project_backend.Models.Exceptions.Universal;
 using System.Collections.Generic;
 
 namespace project_backend.Providers.JobProvider
@@ -40,6 +41,27 @@ namespace project_backend.Providers.JobProvider
             _dbContext.SaveChanges();
 
             return newJob;
+        }
+
+        public JobDAO EditJob(int id, string newName, string newDescription, int userId)
+        {
+            JobDAO correspondingJob = _dbContext.Jobs
+                            .Include(job => job.Images)
+                            .Where(job => job.Id == id)
+                            .FirstOrDefault();
+
+            if (correspondingJob == null)
+                throw new ResourceNotFoundException("Job not found");
+
+            if (correspondingJob.UserId != userId)
+                throw new UnauthorizedException("User isn't the author of the job");
+
+            correspondingJob.Name = newName;
+            correspondingJob.Description = newDescription;
+
+            _dbContext.SaveChanges();
+
+            return correspondingJob;
         }
 
         public JobDAO GetJobById(int jobId)
