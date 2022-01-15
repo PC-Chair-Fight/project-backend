@@ -12,7 +12,6 @@ using Microsoft.OpenApi.Models;
 using project_backend.Models.Validators.BidController.AddBid;
 using project_backend.Models.Validators.BidController.EditJob;
 using project_backend.Models.Validators.JobController.AddJob;
-using project_backend.Models.Validators.JobController.GetJobBids;
 using project_backend.Models.Validators.JobController.GetJobs;
 using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
@@ -21,8 +20,6 @@ using project_backend.Providers.WorkerApplicationProvider;
 using project_backend.Providers.WorkerProvider;
 using project_backend.Repos;
 using System;
-using System.IO;
-using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -135,22 +132,7 @@ namespace project_backend
 
             // This allows the usage of the wwwroot folder. In there, we can store static content, such as images and static pages (maybe 401/404 pages)
             // Right now, as you can see, it is protected by authentication, so if you don't have the Bearer token in the header then the server will drop the request
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = ctx =>
-                {
-                    if (!ctx.Context.User.Identity.IsAuthenticated)
-                    {
-                        ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-
-                        // If you want to redirect, consider creating a 401 page and redirecting to that using
-                        // ctx.Context.Response.Redirect("/my-401-page");
-                        ctx.Context.Response.ContentLength = 0;
-                        ctx.Context.Response.Headers.Add("Cache-Control", "no-store");
-                        ctx.Context.Response.Body = Stream.Null;
-                    }
-                }
-            });
+            app.UseStaticFiles(new StaticFileOptions());
 
             app.UseEndpoints(endpoints =>
             {
