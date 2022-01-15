@@ -12,7 +12,6 @@ using Microsoft.OpenApi.Models;
 using project_backend.Models.Validators.BidController.AddBid;
 using project_backend.Models.Validators.BidController.EditJob;
 using project_backend.Models.Validators.JobController.AddJob;
-using project_backend.Models.Validators.JobController.GetJobBids;
 using project_backend.Models.Validators.JobController.GetJobs;
 using project_backend.Providers.BidProvider;
 using project_backend.Providers.JobProvider;
@@ -139,6 +138,10 @@ namespace project_backend
             {
                 OnPrepareResponse = ctx =>
                 {
+                    if (ctx.Context.Request.Host.Value == (string)Configuration.GetValue(typeof(string), "AllowedHosts"))
+                    {
+                        return;
+                    }
                     if (!ctx.Context.User.Identity.IsAuthenticated)
                     {
                         ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
